@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "homepage.title",
+      "type": "java.lang.String",
+      "description": "Description for homepage.title."
+  }
+] }
