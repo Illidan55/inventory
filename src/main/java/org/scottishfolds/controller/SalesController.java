@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class ItemController {
+@RequestMapping("/sales/")
+public class SalesController {
     private final ItemService itemService;
 
-    public ItemController(ItemService itemService) {
+    public SalesController(ItemService itemService) {
         this.itemService = itemService;
     }
 
@@ -26,28 +27,28 @@ public class ItemController {
 
     }
 
-    @PostMapping("/addItem")
-    public String createItem(@ModelAttribute("createItem") CreateItem createItem) {
+    @PostMapping("/addSale")
+    public String createSale(@ModelAttribute("createItem") CreateItem createItem) {
         itemService.createItem(createItem);
-        return "redirect:/";
+        return "redirect:/sales/";
     }
 
-    @RequestMapping(value = "/editItem", method = {RequestMethod.PUT, RequestMethod.GET})
-    public String editItem(Item item) {
+    @RequestMapping(value = "/editSale", method = {RequestMethod.PUT, RequestMethod.GET})
+    public String editSale(Item item) {
         itemService.save(item);
-        return "redirect:/";
+        return "redirect:/sales/";
     }
 
-    @RequestMapping(value = "/getItem/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getSale/{id}", method = RequestMethod.GET)
     @ResponseBody
     public Optional<Item> findById(@PathVariable(name = "id") String id) {
         return itemService.findById(id);
     }
 
-    @RequestMapping(value = "/deleteItem", method = {RequestMethod.DELETE, RequestMethod.GET})
-    public String deleteItem(String id) {
+    @RequestMapping(value = "/deleteSale", method = {RequestMethod.DELETE, RequestMethod.GET})
+    public String deleteSale(String id) {
         itemService.deleteById(id);
-        return "redirect:/";
+        return "redirect:/sales/";
     }
 
     @GetMapping("/page")
@@ -78,6 +79,6 @@ public class ItemController {
 
 
 
-        return "index";
+        return "sales";
     }
 }

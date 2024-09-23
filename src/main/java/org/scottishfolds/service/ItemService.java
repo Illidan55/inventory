@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,40 +23,34 @@ public class ItemService {
         return itemRepository.findById(id);
     }
 
-    public List<Item> findByCountGreaterThan(int count) {
-        return itemRepository.findByCountGreaterThan(count);
-    }
-
-    public boolean createItem(CreateItem createItem) {
+    public void createItem(CreateItem createItem) {
         Item item = new Item();
         item.setName(createItem.getName());
         item.setType(createItem.getType());
         item.setCount(0);
         item.setCostPerUnit(createItem.getCostPerUnit());
 
-        Item created = itemRepository.save(item);
-        if (created != null && created.getId() != null && !created.getId().isEmpty()) {
-            return true;
-        }
-        return false;
-    }
-    public boolean save(Item item) {
         itemRepository.save(item);
-        if (item != null && item.getId() != null && !item.getId().isEmpty()) {
-            return true;
-        }
-        return false;
+
     }
 
-    public List<Item> findAll() {
-        return itemRepository.findAll();
+    public void save(Item item) {
+        itemRepository.save(item);
     }
+
     public void deleteById(String id) {
         itemRepository.deleteById(id);
     }
-    public Page<Item> findByPage(int page, int size, String sortField, String sortDirection) {
+
+    public Page<Item> findAll(int page, int size, String sortField, String sortDirection) {
         Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return itemRepository.findAll(pageable);
+    }
+
+    public Page<Item> findByKeyWord(int page, int size, String sortField, String sortDirection, String keyword) {
+        Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return itemRepository.findByKeyword(keyword, pageable);
     }
 }

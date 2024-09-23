@@ -2,8 +2,11 @@ package org.scottishfolds.controller;
 
 
 import org.scottishfolds.entity.Item;
+import org.scottishfolds.entity.Product;
 import org.scottishfolds.requestDTO.CreateItem;
+import org.scottishfolds.requestDTO.CreateProduct;
 import org.scottishfolds.service.ItemService;
+import org.scottishfolds.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,11 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class ItemController {
-    private final ItemService itemService;
+@RequestMapping("/product/")
+public class ProductController {
+    private final ProductService productService;
 
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     @RequestMapping("/")
@@ -26,28 +30,28 @@ public class ItemController {
 
     }
 
-    @PostMapping("/addItem")
-    public String createItem(@ModelAttribute("createItem") CreateItem createItem) {
-        itemService.createItem(createItem);
-        return "redirect:/";
+    @PostMapping("/addProduct")
+    public String createProduct(@ModelAttribute("createItem") CreateProduct createProduct) {
+        productService.createProduct(createProduct);
+        return "redirect:/product/";
     }
 
-    @RequestMapping(value = "/editItem", method = {RequestMethod.PUT, RequestMethod.GET})
-    public String editItem(Item item) {
-        itemService.save(item);
-        return "redirect:/";
+    @RequestMapping(value = "/editProduct", method = {RequestMethod.PUT, RequestMethod.GET})
+    public String editProduct(Product product) {
+        productService.save(product);
+        return "redirect:/product/";
     }
 
-    @RequestMapping(value = "/getItem/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getProduct/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public Optional<Item> findById(@PathVariable(name = "id") String id) {
-        return itemService.findById(id);
+    public Optional<Product> findById(@PathVariable(name = "id") String id) {
+        return productService.findById(id);
     }
 
-    @RequestMapping(value = "/deleteItem", method = {RequestMethod.DELETE, RequestMethod.GET})
-    public String deleteItem(String id) {
-        itemService.deleteById(id);
-        return "redirect:/";
+    @RequestMapping(value = "/deleteProduct", method = {RequestMethod.DELETE, RequestMethod.GET})
+    public String deleteProduct(String id) {
+        productService.deleteById(id);
+        return "redirect:/product/";
     }
 
     @GetMapping("/page")
@@ -57,16 +61,16 @@ public class ItemController {
                           @RequestParam String sortDirection,
                           @RequestParam(required = false) String keyword,
                           Model model) {
-        Page<Item> page;
+        Page<Product> page;
 
         if (keyword != null && !keyword.isEmpty()) {
-            page = itemService.findByKeyWord(pageNumber, pageSize, sortField, sortDirection, keyword);
+            page = productService.findByKeyWord(pageNumber, pageSize, sortField, sortDirection, keyword);
         } else {
-            page = itemService.findAll(pageNumber, pageSize, sortField, sortDirection);
+            page = productService.findAll(pageNumber, pageSize, sortField, sortDirection);
         }
 
-        List<Item> items = page.getContent();
-        model.addAttribute("items", items);
+        List<Product> products = page.getContent();
+        model.addAttribute("products", products);
         model.addAttribute("pageNumber", pageNumber);
         model.addAttribute("pageSize", pageSize);
         model.addAttribute("sortField", sortField);
@@ -78,6 +82,6 @@ public class ItemController {
 
 
 
-        return "index";
+        return "product";
     }
 }
