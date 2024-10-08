@@ -2,6 +2,9 @@ package org.scottishfolds.requestDTO;
 
 import lombok.Data;
 
+/**
+ * Dto for Product Modal
+ */
 @Data
 public class CreateProduct {
     private String name;

@@ -7,6 +7,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Mongo repository for products that allows searching multiple columns
+ */
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String> {
     @Query("{ '$or': [ { 'name': { '$regex': ?0, '$options': 'i' } }, { 'type': { '$regex': ?0, '$options': 'i' } } ] }")

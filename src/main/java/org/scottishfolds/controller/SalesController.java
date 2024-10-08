@@ -12,9 +12,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Sales controller to handle the backend for sales
+ */
 @Controller
 @RequestMapping("/sales/")
 public class SalesController {
+
+    //TODO This is a placeholder controller
+    // - Implement sales controller and service and thymeleaf frontend
+
+
     private final ItemService itemService;
 
     public SalesController(ItemService itemService) {
@@ -76,7 +84,6 @@ public class SalesController {
         model.addAttribute("reverseSort", sortDirection.equals("asc") ? "desc" : "asc");
         model.addAttribute("totalItems", page.getTotalElements());
         model.addAttribute("totalPages", page.getTotalPages());
-
 
 
         return "sales";
