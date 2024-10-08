@@ -1,4 +1,5 @@
 <h1 align="center"> Inventory App </h1> <br>
+
 ![image](https://github.com/user-attachments/assets/1d876789-da93-4c3f-a634-ab3b1709380e)
 
 
