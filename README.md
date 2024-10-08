@@ -8,7 +8,7 @@
 </p>
 
 ## Requirements
-The application can be run locally, the requirements are that the follow environment variables need to be set in a application-dev.yml file under /resources/
+The application can be run locally, the requirements are that the following environment variables need to be set in a application-dev.yml file under /resources/
 
 -MONGODB_HOST:&emsp;&emsp;&emsp;//Hostname for a running MongoDb
 
@@ -37,7 +37,7 @@ A running instance of [MongoDB](https://www.mongodb.com/) is required to run thi
 ## Quick Start
 Create application-dev.yml and add the properties listed in requirments
 
-Make sure the MongoDB instance is running and is configure properly in application-dev.yml
+Make sure the MongoDB instance is running and is configured properly in application-dev.yml
 
 ### Run Local
 ```bash
