@@ -15,7 +15,7 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li th:each="sizeOpt : ${ {5, 10, 15, 25} }"> <a class="dropdown-item" href="#"
-                                                                     th:href="@{${basePath}(pageNumber=${page.number + 1}, pageSize=${sizeOpt}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                                                                     th:href="@{${basePath}(pageNumber=1, pageSize=${sizeOpt}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
                                                                      th:text="${sizeOpt}"></a>
                     </li>
                 </ul>
