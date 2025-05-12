@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="paginationNav(page, sortField, sortDirection, keyword, basePath)"
+     th:if="${page != null && page.totalPages > 0}" class="d-flex justify-content-between align-items-center mt-3">
+
+    <div th:if="${page.totalPages > 1}">
+        <div class="d-flex align-items-center">
+            <div class="me-2">Page Size:</div>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false"
+                        th:text="${page.size}">
+                </button>
+                <ul class="dropdown-menu">
+                    <li th:each="sizeOpt : ${ {5, 10, 15, 25} }"> <a class="dropdown-item" href="#"
+                                                                     th:href="@{${basePath}(pageNumber=${page.number + 1}, pageSize=${sizeOpt}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                                                                     th:text="${sizeOpt}"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div th:unless="${page.totalPages > 1}"></div> <div>
+    <nav aria-label="Pagination" th:if="${page.totalPages > 1}">
+        <ul class="pagination justify-content-center mb-0"> <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{${basePath}(pageNumber=1, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">First</a>
+        </li>
+
+            <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${basePath}(pageNumber=${page.number}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">Previous</a>
+            </li>
+
+            <li class="page-item" th:each="i : ${#numbers.sequence(1, page.totalPages)}"
+                th:classappend="${i == page.number + 1} ? 'active'">
+                <a class="page-link" th:if="${i != page.number + 1}"
+                   th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                   th:text="${i}"></a>
+                <span class="page-link" th:unless="${i != page.number + 1}" th:text="${i}"></span>
+            </li>
+
+
+            <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${basePath}(pageNumber=${page.number + 2}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">Next</a>
+            </li>
+
+            <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${basePath}(pageNumber=${page.totalPages}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">Last</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+    <div class="text-muted"> Total Items: <span th:text="${page.totalElements}"></span>
+    </div>
+</div>
+
+</body>
+</html>

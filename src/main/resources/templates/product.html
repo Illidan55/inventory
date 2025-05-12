@@ -119,69 +119,11 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="d-flex justify-content-between">
-                <div th:if="${totalPages > 1}">
-                    <div class="d-flex">
-                        <div class="me-4">
-                            PageSize:
-                        </div>
-                        <div>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                    [[${pageSize}]]
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><a class="dropdown-item" href="#"
-                                           th:href="@{'/product/page?pageNumber=' + ${pageNumber} +'&pageSize=' + ${5} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection} + '&keyword=' + ${keyword}}">5</a>
-                                    </li>
-                                    <li><a class="dropdown-item" href="#"
-                                           th:href="@{'/product/page?pageNumber=' + ${pageNumber} +'&pageSize=' + ${10} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection}+ '&keyword=' + ${keyword}} ">10</a>
-                                    </li>
-                                    <li><a class="dropdown-item" href="#"
-                                           th:href="@{'/product/page?pageNumber=' + ${pageNumber} +'&pageSize=' + ${15} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection}+ '&keyword=' + ${keyword}}">15</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <nav aria-label="Pagination" th:if="${totalPages > 1}">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item">
-                                <a class="page-link" th:if="${pageNumber > 1}"
-                                   th:href="@{'/product/page?pageNumber=' + ${1} +'&pageSize=' + ${pageSize} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection}+ '&keyword=' + ${keyword}}">First</a>
-                                <span class="page-link disabled" th:unless="${pageNumber != 1}">First</span> &nbsp; &nbsp;
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" th:if="${pageNumber > 1}"
-                                   th:href="@{'/product/page?pageNumber=' + ${pageNumber - 1} +'&pageSize=' + ${pageSize} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection}+ '&keyword=' + ${keyword}}">Previous</a>
-                                <span class="page-link disabled" th:unless="${pageNumber != 1}">Previous</span> &nbsp; &nbsp;
-                            </li>
-                            <span th:each="i: ${#numbers.sequence(1, totalPages)}">
-                                <li class="page-item">
-                                    <a class="page-link" th:if="${pageNumber != i}"
-                                       th:href="@{'/product/page?pageNumber=' + ${i} +'&pageSize=' + ${pageSize} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection}+ '&keyword=' + ${keyword}}">[[${i}]] </a>
-                                    <span class="page-link disabled" th:unless="${pageNumber != i}">[[${i}]]</span> &nbsp; &nbsp;
-                                </li>
-                            </span>
-                            <li class="page-item">
-                                <a class="page-link" th:if="${pageNumber < totalPages}"
-                                   th:href="@{'/product/page?pageNumber=' + ${pageNumber + 1} +'&pageSize=' + ${pageSize} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection}+ '&keyword=' + ${keyword}}">Next</a>
-                                <span class="page-link disabled" th:unless="${pageNumber != totalPages}">Next</span> &nbsp; &nbsp;
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" th:if="${pageNumber < totalPages}"
-                                   th:href="@{'/product/page?pageNumber=' + ${totalPages} +'&pageSize=' + ${pageSize} + '&sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection}+ '&keyword=' + ${keyword}}">Last</a>
-                                <span class="page-link disabled" th:unless="${pageNumber != totalPages}">Last</span> &nbsp; &nbsp;
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="page-item-disabled">
-                    Total Products: [[${totalItems}]]
-                </div>
+            <div th:replace="~{fragments/pagination :: paginationNav(
+             page=${page},  sortField=${sortField},
+             sortDirection=${sortDirection},
+             keyword=${keyword},
+             basePath=@{'/product/page'} )}">
             </div>
         </div>
         <!--Add-->
@@ -249,7 +191,7 @@
         <!--Edit-->
         <div class="modal fade" id="editProductModal" tabindex="-1" role="dialog" aria-labelledby="editProductModalLabel"
              aria-hidden="true">
-            <form th:action="@{/product/editProduct}" method="GET">
+            <form th:action="@{/product/editProduct}" method="POST">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -315,7 +257,7 @@
         <!--Delete-->
         <div class="modal fade" id="deleteProductModal" tabindex="-1" role="dialog" aria-labelledby="deleteProductModalLabel"
              aria-hidden="true">
-            <form th:action="@{/product/deleteProduct}" method="GET">
+            <form th:action="@{/product/deleteProduct}" method="POST">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">

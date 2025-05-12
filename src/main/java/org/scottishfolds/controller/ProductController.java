@@ -16,7 +16,7 @@ import java.util.Optional;
  * Product Controller to handle the backend for product inventory
  */
 @Controller
-@RequestMapping("/product/")
+@RequestMapping("/product")
 public class ProductController {
     private final ProductService productService;
 
@@ -37,9 +37,14 @@ public class ProductController {
      * @param model
      * @return
      */
-    @RequestMapping("/")
-    public String homePage(Model model) {
-        return getPage(1, 10, "name", "asc", null, model);
+    @GetMapping("/")
+    public String homePage(@RequestParam(defaultValue = "1") int pageNumber,
+                           @RequestParam(defaultValue = "10") int pageSize,
+                           @RequestParam(defaultValue = "name") String sortField,
+                           @RequestParam(defaultValue = "asc") String sortDirection,
+                           Model model) {
+        // Directly call getPage, keyword is null here
+        return getPage(pageNumber, pageSize, sortField, sortDirection, null, model);
 
     }
 
@@ -61,7 +66,7 @@ public class ProductController {
      * @param product
      * @return
      */
-    @RequestMapping(value = "/editProduct", method = {RequestMethod.PUT, RequestMethod.GET})
+    @PostMapping(value = "/editProduct")
     public String editProduct(Product product) {
         productService.save(product);
         return "redirect:/product/";
@@ -73,7 +78,7 @@ public class ProductController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/getProduct/{id}", method = RequestMethod.GET)
+    @GetMapping("/getProduct/{id}")
     @ResponseBody
     public Optional<Product> findById(@PathVariable(name = "id") String id) {
         return productService.findById(id);
@@ -85,8 +90,8 @@ public class ProductController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/deleteProduct", method = {RequestMethod.DELETE, RequestMethod.GET})
-    public String deleteProduct(String id) {
+    @PostMapping("/deleteProduct")
+    public String deleteProduct(@RequestParam String id) {
         productService.deleteById(id);
         return "redirect:/product/";
     }
@@ -105,30 +110,31 @@ public class ProductController {
      * @return
      */
     @GetMapping("/page")
-    public String getPage(@RequestParam int pageNumber,
-                          @RequestParam int pageSize,
-                          @RequestParam String sortField,
-                          @RequestParam String sortDirection,
+    public String getPage(@RequestParam(defaultValue = "1") int pageNumber, // Added default values
+                          @RequestParam(defaultValue = "10") int pageSize,
+                          @RequestParam(defaultValue = "name") String sortField,
+                          @RequestParam(defaultValue = "asc") String sortDirection,
                           @RequestParam(required = false) String keyword,
                           Model model) {
-        Page<Product> page;
+        Page<Product> pageResult;
 
         if (keyword != null && !keyword.isEmpty()) {
-            page = productService.findByKeyWord(pageNumber, pageSize, sortField, sortDirection, keyword);
+            pageResult = productService.findByKeyWord(pageNumber, pageSize, sortField, sortDirection, keyword);
         } else {
-            page = productService.findAll(pageNumber, pageSize, sortField, sortDirection);
+            pageResult = productService.findAll(pageNumber, pageSize, sortField, sortDirection);
         }
 
-        List<Product> products = page.getContent();
-        model.addAttribute("products", products);
-        model.addAttribute("pageNumber", pageNumber);
-        model.addAttribute("pageSize", pageSize);
+        List<Product> products = pageResult.getContent();
+        // 1. Add the Page object itself to the model
+        model.addAttribute("page", pageResult); // Use "page" as the attribute name
+
+        // 2. Add the list of items separately (needed for th:each in the table)
+        model.addAttribute("products", pageResult.getContent());
+
+        // 3. Add attributes required by the fragment *parameters* that are NOT in the Page object easily
         model.addAttribute("sortField", sortField);
-        model.addAttribute("keyword", keyword != null ? keyword : "");
         model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("reverseSort", sortDirection.equals("asc") ? "desc" : "asc");
-        model.addAttribute("totalItems", page.getTotalElements());
-        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("keyword", keyword != null ? keyword : "");
 
 
         return "product";
