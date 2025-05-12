@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-    <head th:replace="~{fragments/common-head :: headContent(
+<head th:replace="~{fragments/common-head :: headContent(
             pageTitle='Raw Material Inventory',
             pageSpecificScripts=~{:: #page-scripts}
         )}">
-    </head>
-    <body>
-    <th:block id="page-scripts">
-        <script type="module" src="/js/inventory-action.js"></script>
-    </th:block>
-    <div th:replace="~{fragments/header :: header}"></div>
-    <div class="title-container">
-        <div class="title-logo">
-            <img class="logo" th:src="@{images/logo.png}" alt="logo"/>
-        </div>
-        <div class="title-text">
-            <h1 th:text="${@environment.getProperty('homepage.title')}"/>
-            <h1>Raw Material Inventory</h1>
-        </div>
+</head>
+<body>
+<th:block id="page-scripts">
+    <script type="module" src="/js/inventory-action.js"></script>
+</th:block>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="title-container">
+    <div class="title-logo">
+        <img class="logo" th:src="@{/images/logo.png}" alt="logo"/>
     </div>
-    <div id="sortData"
-         th:data-page-number="${page.number + 1}"
-         th:data-page-size="${page.size}"
-         th:data-keyword="${keyword}"
-         th:data-base-path="@{/page}"
-         th:data-sort-field="${sortField}"
-         th:data-sort-direction="${sortDirection}" >
+    <div class="title-text">
+        <h1 th:text="${@environment.getProperty('homepage.title')}"/>
+        <h1>Raw Material Inventory</h1>
     </div>
-    <main>
+</div>
+<div id="sortData"
+     th:data-page-number="${page.number + 1}"
+     th:data-page-size="${page.size}"
+     th:data-keyword="${keyword}"
+     th:data-base-path="@{/page}"
+     th:data-sort-field="${sortField}"
+     th:data-sort-direction="${sortDirection}">
+</div>
+<main>
     <div class="container my-2">
         <div class="d-flex justify-content-between">
-            <div class = "col-sm-1"></div>
+            <div class="col-sm-1"></div>
             <div class="w-100">
                 <div th:replace="~{fragments/search :: searchBar(
                      keyword=${keyword},
@@ -45,44 +45,45 @@
             </div>
             <div class="col-sm-1 mt-2">
                 <button class="btn btn-primary btn-md mb-3 btn-right" data-bs-toggle="modal"
-                    data-bs-target="#addItemModal">
-                Add Item
+                        data-bs-target="#addItemModal">
+                    Add Item
                 </button>
             </div>
         </div>
         <table class="table table-sm table-striped table-responsive table-bordered border-dark">
             <thead class="table-dark">
-                <tr>
-                    <th>Name
-                        <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
+            <tr>
+                <th>Name
+                    <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
                                     btn-right" data-column="name"></a></th>
-                    <th>Type
-                        <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
+                <th>Type
+                    <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
                                     btn-right" data-column="type"></a></th>
-                    <th>Count
-                        <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
+                <th>Count
+                    <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
                                      btn-right" data-column="count"></a></th>
-                    <th>Cost Per Unit
-                        <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm
+                <th>Cost Per Unit
+                    <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm
                                      mb-3 btn-right" data-column="costPerUnit"></a></th>
-                    <th class="column col-sm-2 align-top">Actions</th>
-                </tr>
+                <th class="column col-sm-2 align-top">Actions</th>
+            </tr>
             </thead>
             <tbody>
-                <tr th:each="item : ${items}">
-                    <td th:text="${item.id}" hidden/>
-                    <td th:text="${item.name}"/>
-                    <td th:text="${item.type}"/>
-                    <td th:text="${item.count}"/>
-                    <td th:text="'$'+ ${item.costPerUnit}"/>
-                    <td>
-                        <a th:href="@{/getItem/__${item.id}__}"
-                           class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
-                           data-bs-target="#editItemModal">Edit</a>
-                        <a th:href="@{/getItem/__${item.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"   th:attr="data-item-id=${item.id}, data-item-name=${item.name}" data-bs-toggle="modal"
-                           data-bs-target="#deleteItemModal">Delete</a>
-                    </td>
-                </tr>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.id}" hidden/>
+                <td th:text="${item.name}"/>
+                <td th:text="${item.type}"/>
+                <td th:text="${item.count}"/>
+                <td th:text="'$'+ ${item.costPerUnit}"/>
+                <td>
+                    <a th:href="@{/getItem/__${item.id}__}"
+                       class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
+                       data-bs-target="#editItemModal">Edit</a>
+                    <a th:href="@{/getItem/__${item.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"
+                       th:attr="data-item-id=${item.id}, data-item-name=${item.name}" data-bs-toggle="modal"
+                       data-bs-target="#deleteItemModal">Delete</a>
+                </td>
+            </tr>
             </tbody>
         </table>
 
@@ -92,32 +93,33 @@
              keyword=${keyword},
              basePath=@{'/page'} )}">
         </div>
-    </main>
-        <div th:replace="~{fragments/modals :: formModal(
+    </div>
+</main>
+<div th:replace="~{fragments/modals :: formModal(
         modalId='addItemModal',
         modalTitle='Add Item',
         formAction=@{/addItem},
         formMethod='POST',
         formBodyFragmentRef=~{fragments/forms :: itemFormFields(editMode=false)}
      )}">
-        </div>
+</div>
 
-        <div th:replace="~{fragments/modals :: formModal(
+<div th:replace="~{fragments/modals :: formModal(
         modalId='editItemModal',
         modalTitle='Edit Item',
         formAction=@{/editItem},
         formMethod='POST',
         formBodyFragmentRef=~{fragments/forms :: itemFormFields(editMode=true)}
      )}">
-        </div>
+</div>
 
-        <div th:replace="~{fragments/modals :: deleteConfirmModal(
+<div th:replace="~{fragments/modals :: deleteConfirmModal(
         modalId='deleteItemModal',
         modalTitle='Delete Item',
         messageId='messageDeleteItem',
         formAction=@{/deleteItem},
         formInputId='formIdDeleteItem'
      )}">
-        </div>
-    </body>
+</div>
+</body>
 </html>
