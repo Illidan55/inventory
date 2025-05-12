@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="searchBar(keyword, sortField, sortDirection, pageSize, formActionPath, clearActionPath, placeholderText)" class="w-100">
+  <form th:action="@{${formActionPath}}" id="searchForm" method="GET"> <div class="row d-flex justify-content-center">
+    <div class="col-md-6 mt-2">
+      <div class="search d-flex"> <input id="keyword" type="search" th:value="${keyword}" name="keyword" class="form-control me-2" th:placeholder="${placeholderText != null ? placeholderText : 'Enter keyword'}">
+
+        <input type="hidden" name="sortField" th:value="${sortField}">
+        <input type="hidden" name="sortDirection" th:value="${sortDirection}">
+        <input type="hidden" name="pageSize" th:value="${pageSize}">
+
+        <button type="submit" class="btn btn-secondary btn-md">Search</button> </div>
+    </div>
+    <div class="col-md-1 mt-2">
+      <a th:href="@{${clearActionPath}}" class="btn btn-info btn-md text-white">Clear</a> </div>
+  </div>
+  </form>
+</div>
+
+</body>
+</html>

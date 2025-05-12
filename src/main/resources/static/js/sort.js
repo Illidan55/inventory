@@ -32,7 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const pageNumber = sortDataElement.dataset.pageNumber;
             const pageSize = sortDataElement.dataset.pageSize;
             const keyword = sortDataElement.dataset.keyword || ''; // Handle potential undefined keyword
-            const nextSortDirection = sortDataElement.dataset.reverseSort;
+            // These are CRITICAL for toggling sort direction:
+            const currentSortField = sortDataElement.dataset.sortField;
+            const currentSortDirection = sortDataElement.dataset.sortDirection;
+
+            let nextSortDirection;
+            if (columnToSort === currentSortField) {
+                nextSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                nextSortDirection = 'asc';
+            }
 
             // Construct the URL using the dynamic base path
             const url = `${basePath}?pageNumber=${pageNumber}&pageSize=${pageSize}&sortField=${columnToSort}&sortDirection=${nextSortDirection}&keyword=${keyword}`;

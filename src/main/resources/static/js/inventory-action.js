@@ -1,24 +1,58 @@
 //jquery
-$('document').ready(function () {
-    $('.table .btn').on('click', function (event) {
+$(document).ready(function () {
+    $('.table tbody').on('click', '.btn', function (event) {
         event.preventDefault();
-        const href = $(this).attr('href');
-        if ($(this).attr('id') === 'buttonEdit') {
+        const $button = $(this);
+        const href = $button.attr('href');
 
+        if ($button.hasClass('btn-edit')) {
             $.get(href, function (item) {
-                $('#formIdEdit').val(item.id);
-                $('#formNameEdit').val(item.name);
-                $('#formTypeEdit').val(item.type);
-                $('#formCountEdit').val(item.count);
-                $('#formCostEdit').val(item.costPerUnit);
+                $('#formIdEditItem').val(item.id);
+                $('#formNameEditItem').val(item.name);
+                $('#formTypeEditItem').val(item.type);
+                $('#formCountEditItem').val(item.count);
+                $('#formCostEditItem').val(item.costPerUnit);
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.error("Error fetching item data for edit:", textStatus, errorThrown);
+                alert("Failed to load item data for editing.");
             });
-            $('#editItemModal').modal('show');
-        } else if ($(this).attr('id') === 'buttonDelete') {
-            $.get(href, function (item) {
-                $('#formIdDelete').val(item.id);
-                $('#messageDelete').html("Do you want to delete " + item.name + "?");
-            });
-            $('#deleteItemModal').modal('show');
+
+            const editModalElement = document.getElementById('editItemModal');
+            if (editModalElement) {
+                const modal = bootstrap.Modal.getOrCreateInstance(editModalElement);
+                modal.show();
+            } else {
+                console.error("Edit modal #editItemModal not found in DOM");
+            }
+
+        } else if ($button.hasClass('btn-delete')) {
+            const itemId = $button.data('item-id');
+            const itemName = $button.data('item-name');
+            const modalTargetSelector = $button.data('bs-target');
+
+            if (itemId !== undefined && itemName !== undefined && modalTargetSelector) {
+                const modalElement = document.querySelector(modalTargetSelector); // Use vanilla JS selector
+                if (modalElement) {
+                    const inputIdElement = modalElement.querySelector('#formIdDeleteItem');
+                    const messageElement = modalElement.querySelector('#messageDeleteItem');
+                    if (inputIdElement) {
+                        inputIdElement.value = itemId;
+                    } else {
+                        console.error("Input #formIdDeleteItem not found inside modal:", modalTargetSelector);
+                    }
+                    if (messageElement) {
+                        messageElement.textContent = `Do you want to delete '${itemName}'?`;
+                    } else {
+                        console.error("Message element #messageDeleteItem not found inside modal:", modalTargetSelector);
+                    }
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                    modal.show();
+                } else {
+                    console.error("Delete modal element not found using selector:", modalTargetSelector);
+                }
+            } else {
+                console.error("Missing data-item-id, data-item-name, or data-bs-target on delete button:", $button[0]);
+            }
         }
     });
 });

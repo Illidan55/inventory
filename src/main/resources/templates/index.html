@@ -38,24 +38,16 @@
         <div class="d-flex justify-content-between">
             <div class = "col-sm-1"></div>
             <div class="w-100">
-                <form th:action="@{/page}" id="searchForm">
-                    <div class="row d-flex justify-content-center">
-                        <div class="col-md-6 mt-2">
-                            <div class="search">
-                                <input id="keyword" type="search" th:value="${keyword}" name="keyword" class="form-control"
-                                       placeholder="Enter keyword">
-                                <input type = "text" name="sortField" th:value="${sortField}" class="form-control" hidden>
-                                <input type = "text" name="sortDirection" th:value="${sortDirection}" class="form-control" hidden>
-                                <input type = "number" name="pageNumber" th:value="${pageNumber}" class="form-control" hidden>
-                                <input type = "number" name="pageSize" th:value="${pageSize}" class="form-control" hidden>
-                                <button type="submit" class="btn btn-secondary btn-md mb-3">Search</button>
-                            </div>
-                        </div>
-                        <div class="col-md-1 mt-2">
-                            <a th:href="@{/}" class="btn btn-info btn-md mb-3 text-white">Clear</a>
-                        </div>
-                    </div>
-                </form>
+                <div th:replace="~{fragments/search :: searchBar(
+                     keyword=${keyword},
+                     sortField=${sortField},
+                     sortDirection=${sortDirection},
+                     pageSize=${page != null ? page.size : pageSize},
+                     formActionPath=@{'/page'},
+                     clearActionPath=@{'/'},
+                     placeholderText='Search Raw Materials...'
+                 )}">
+                </div>
             </div>
             <div class="col-sm-1 mt-2">
                 <button class="btn btn-primary btn-md mb-3 btn-right" data-bs-toggle="modal"
@@ -67,11 +59,12 @@
         <table class="table table-sm table-striped table-responsive table-bordered border-dark">
             <thead class="table-dark">
             <div id="sortData"
-                 th:data-page-number="${pageNumber}"
-                 th:data-page-size="${pageSize}"
-                 th:data-reverse-sort="${reverseSort}"
+                 th:data-page-number="${page.number + 1}"
+                 th:data-page-size="${page.size}"
+                 th:data-keyword="${keyword}"
                  th:data-base-path="@{/page}"
-                 th:data-keyword="${keyword}">
+                 th:data-sort-field="${sortField}"
+                 th:data-sort-direction="${sortDirection}" >
             </div>
                 <tr>
                     <th>Name
@@ -96,11 +89,13 @@
                     <td th:text="${item.type}"/>
                     <td th:text="${item.count}"/>
                     <td th:text="'$'+ ${item.costPerUnit}"/>
-                    <td><a th:href="@{/getItem/__${item.id}__}" class="btn btn-warning btn-sm mb-3 text-white me-3"
-                           id="buttonEdit">Edit</a>
-                        <a th:href="@{/getItem/__${item.id}__}" class="btn btn-danger btn-sm mb-3" id="buttonDelete">Delete</a>
+                    <td>
+                        <a th:href="@{/getItem/__${item.id}__}"
+                           class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
+                           data-bs-target="#editItemModal">Edit</a>
+                        <a th:href="@{/getItem/__${item.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"   th:attr="data-item-id=${item.id}, data-item-name=${item.name}" data-bs-toggle="modal"
+                           data-bs-target="#deleteItemModal">Delete</a>
                     </td>
-
                 </tr>
             </tbody>
         </table>
@@ -111,113 +106,32 @@
              keyword=${keyword},
              basePath=@{'/page'} )}">
         </div>
-    <!--Add-->
-    <div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel"
-         aria-hidden="true">
-        <form th:action="@{/addItem}" method="POST">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addItemModalLabel">Add Item</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="formNameAdd" class="form-label">Name</label>
-                            <input required type="text" id="formNameAdd" name="name" placeholder="Name"
-                                   class="form-control mb-4 col-4"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="formTypeAdd" class="form-label">Type</label>
-                            <input required type="text" id="formTypeAdd" name="type" placeholder="Type"
-                                   class="form-control mb-4 col-4"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="formCostAdd" class="form-label">Cost Per Unit</label>
-                            <input required type="number" step="0.01" id="formCostAdd" name="costPerUnit"
-                                   placeholder=0.00
-                                   class="form-control mb-4 col-4"/>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-    <!--Edit-->
-    <div class="modal fade" id="editItemModal" tabindex="-1" role="dialog" aria-labelledby="editItemModalLabel"
-         aria-hidden="true">
-        <form th:action="@{/editItem}" method="POST">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editItemModalLabel">Edit Item</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="formIdEdit" class="form-label">Id</label>
-                            <input required type="text" id="formIdEdit" name="id" placeholder=0
-                                   class="form-control mb-4 col-4" readonly/>
-                        </div>
-                        <div class="form-group">
-                            <label for="formNameEdit" class="form-label">Name</label>
-                            <input required type="text" id="formNameEdit" name="name" placeholder="Name"
-                                   class="form-control mb-4 col-4"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="formTypeEdit" class="form-label">Type</label>
-                            <input required type="text" id="formTypeEdit" name="type" placeholder="Type"
-                                   class="form-control mb-4 col-4"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="formCountEdit" class="form-label">Count</label>
-                            <input required type="number" id="formCountEdit" name="count" placeholder=0
-                                   class="form-control mb-4 col-4"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="formCostEdit" class="form-label">Cost Per Unit</label>
-                            <input required type="number" step="0.01" id="formCostEdit" name="costPerUnit"
-                                   placeholder=0.00
-                                   class="form-control mb-4 col-4"/>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-    <!--Delete-->
-    <div class="modal fade" id="deleteItemModal" tabindex="-1" role="dialog" aria-labelledby="deleteItemModalLabel"
-         aria-hidden="true">
-        <form th:action="@{/deleteItem}" method="POST">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteItemModalLabel">Delete Item</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group" hidden>
-                            <label for="formIdDelete" class="form-label">Id</label>
-                            <input required type="text" id="formIdDelete" name="id" placeholder=0
-                                   class="form-control mb-4 col-4" readonly/>
-                        </div>
-                        <p id="messageDelete"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+        <div th:replace="~{fragments/modals :: formModal(
+        modalId='addItemModal',
+        modalTitle='Add Item',
+        formAction=@{/addItem},
+        formMethod='POST',
+        formBodyFragmentRef=~{fragments/forms :: itemFormFields(editMode=false)}
+     )}">
+        </div>
+
+        <div th:replace="~{fragments/modals :: formModal(
+        modalId='editItemModal',
+        modalTitle='Edit Item',
+        formAction=@{/editItem},
+        formMethod='POST',
+        formBodyFragmentRef=~{fragments/forms :: itemFormFields(editMode=true)}
+     )}">
+        </div>
+
+        <div th:replace="~{fragments/modals :: deleteConfirmModal(
+        modalId='deleteItemModal',
+        modalTitle='Delete Item',
+        messageId='messageDeleteItem',
+        formAction=@{/deleteItem},
+        formMethod='POST',
+        formInputId='formIdDeleteItem'
+     )}">
+        </div>
     </body>
 </html>

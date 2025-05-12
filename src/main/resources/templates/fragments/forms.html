@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="itemFormFields(editMode)">
+  <div class="form-group" th:if="${editMode}">
+    <label for="formIdEditItem" class="form-label">Id</label>
+    <input required type="text" id="formIdEditItem" name="id" value="0" class="form-control mb-4 col-4" readonly/>
+  </div>
+
+  <div class="form-group">
+    <label th:for="${editMode ? 'formNameEditItem' : 'formNameAddItem'}" class="form-label">Name</label>
+    <input required type="text" th:id="${editMode ? 'formNameEditItem' : 'formNameAddItem'}" name="name" placeholder="Name"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group">
+    <label th:for="${editMode ? 'formTypeEditItem' : 'formTypeAddItem'}" class="form-label">Type</label>
+    <input required type="text" th:id="${editMode ? 'formTypeEditItem' : 'formTypeAddItem'}" name="type" placeholder="Type"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group" th:if="${editMode}">
+    <label for="formCountEditItem" class="form-label">Count</label>
+    <input required type="number" id="formCountEditItem" name="count" placeholder="0"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group">
+    <label th:for="${editMode ? 'formCostEditItem' : 'formCostAddItem'}" class="form-label">Cost Per Unit</label>
+    <input required type="number" step="0.01" th:id="${editMode ? 'formCostEditItem' : 'formCostAddItem'}" name="costPerUnit" placeholder="0.00"
+           class="form-control mb-4 col-4"/>
+  </div>
+</div>
+
+
+<div th:fragment="productFormFields(editMode)">
+  <div class="form-group" th:if="${editMode}">
+    <label for="formIdEditProduct" class="form-label">Id</label>
+    <input required type="text" id="formIdEditProduct" name="id" value="0"
+           class="form-control mb-4 col-4" readonly/>
+  </div>
+
+  <div class="form-group">
+    <label th:for="${editMode ? 'formNameEditProduct' : 'formNameAddProduct'}" class="form-label">Name</label>
+    <input required type="text" th:id="${editMode ? 'formNameEditProduct' : 'formNameAddProduct'}" name="name" placeholder="Name"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group">
+    <label th:for="${editMode ? 'formTypeEditProduct' : 'formTypeAddProduct'}" class="form-label">Type</label>
+    <input required type="text" th:id="${editMode ? 'formTypeEditProduct' : 'formTypeAddProduct'}" name="type" placeholder="Type"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group">
+    <label th:for="${editMode ? 'formInStoreStockEditProduct' : 'formInStoreStockAddProduct'}" class="form-label">In Store Stock</label>
+    <input required type="number" th:id="${editMode ? 'formInStoreStockEditProduct' : 'formInStoreStockAddProduct'}" name="inStoreStock" placeholder="0"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group">
+    <label th:for="${editMode ? 'formOnlineStoreStockEditProduct' : 'formOnlineStoreStockAddProduct'}" class="form-label">Online Stock</label>
+    <input required type="number" th:id="${editMode ? 'formOnlineStoreStockEditProduct' : 'formOnlineStoreStockAddProduct'}" name="onlineStock" placeholder="0"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group">
+    <label th:for="${editMode ? 'formBackStockEditProduct' : 'formBackStockAddProduct'}" class="form-label">Back Stock</label>
+    <input required type="number" th:id="${editMode ? 'formBackStockEditProduct' : 'formBackStockAddProduct'}" name="backStock" placeholder="0"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group">
+    <label th:for="${editMode ? 'formInStorePriceEditProduct' : 'formInStorePriceAddProduct'}" class="form-label">In Store Price</label>
+    <input required type="number" step="0.01" th:id="${editMode ? 'formInStorePriceEditProduct' : 'formInStorePriceAddProduct'}" name="inStorePrice" placeholder="0.00"
+           class="form-control mb-4 col-4"/>
+  </div>
+  <div class="form-group">
+    <label th:for="${editMode ? 'formOnlinePriceEditProduct' : 'formOnlinePriceAddProduct'}" class="form-label">Online Price</label>
+    <input required type="number" step="0.01" th:id="${editMode ? 'formOnlinePriceEditProduct' : 'formOnlinePriceAddProduct'}" name="onlinePrice" placeholder="0.00"
+           class="form-control mb-4 col-4"/>
+  </div>
+</div>
+
+</body>
+</html>
