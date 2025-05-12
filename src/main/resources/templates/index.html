@@ -20,39 +20,8 @@
                 crossorigin="anonymous">
 
         </script>
-        <script>
-            $('document').ready(function () {
-                $('.table .btn').on('click', function (event) {
-                    event.preventDefault();
-                    const href = $(this).attr('href');
-                    if ($(this).attr('id') === 'buttonEdit') {
-
-                        $.get(href, function (item) {
-                            $('#formIdEdit').val(item.id);
-                            $('#formNameEdit').val(item.name);
-                            $('#formTypeEdit').val(item.type);
-                            $('#formCountEdit').val(item.count);
-                            $('#formCostEdit').val(item.costPerUnit);
-                        });
-                        $('#editItemModal').modal('show');
-                    } else if ($(this).attr('id') === 'buttonDelete') {
-                        $.get(href, function (item) {
-                            $('#formIdDelete').val(item.id);
-                            $('#messageDelete').html("Do you want to delete " + item.name + "?");
-                        });
-                        $('#deleteItemModal').modal('show');
-                    }
-                });
-            });
-            function sortByColumn(column) {
-                const pageNumber = [[${pageNumber}]];
-                const pageSize = [[${pageSize}]];
-                let sortField = column;
-                const sortDirection = '[[${reverseSort}]]';
-                const keyword = '[[${keyword}]]';
-                window.location.href = `/page?pageNumber=${pageNumber}&pageSize=${pageSize}&sortField=${sortField}&sortDirection=${sortDirection}&keyword=${keyword}`
-            }
-        </script>
+        <script type="module" src="/js/sort.js"></script>
+        <script type="module" src="/js/inventory-action.js"></script>
     </head>
     <body>
     <div th:replace="~{fragments/header :: header}"></div>
@@ -97,19 +66,26 @@
         </div>
         <table class="table table-sm table-striped table-responsive table-bordered border-dark">
             <thead class="table-dark">
+            <div id="sortData"
+                 th:data-page-number="${pageNumber}"
+                 th:data-page-size="${pageSize}"
+                 th:data-reverse-sort="${reverseSort}"
+                 th:data-base-path="@{/page}"
+                 th:data-keyword="${keyword}">
+            </div>
                 <tr>
                     <th>Name
-                        <a href="#" onclick="sortByColumn('name');" class="btn btn-secondary dropdown-toggle btn-sm mb-3
-                        btn-right"></a></th>
+                        <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
+                                    btn-right" data-column="name"></a></th>
                     <th>Type
-                        <a href="#" onclick="sortByColumn('type')" class="btn btn-secondary dropdown-toggle btn-sm mb-3
-                        btn-right"></a></th>
+                        <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
+                                    btn-right" data-column="type"></a></th>
                     <th>Count
-                        <a href="#" onclick="sortByColumn('count')" class="btn btn-secondary dropdown-toggle btn-sm mb-3
-                         btn-right"></a></th>
+                        <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
+                                     btn-right" data-column="count"></a></th>
                     <th>Cost Per Unit
-                        <a href="#" onclick="sortByColumn('costPerUnit')" class="btn btn-secondary dropdown-toggle btn-sm
-                         mb-3 btn-right"></a></th>
+                        <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm
+                                     mb-3 btn-right" data-column="costPerUnit"></a></th>
                     <th class="column col-sm-2 align-top">Actions</th>
                 </tr>
             </thead>

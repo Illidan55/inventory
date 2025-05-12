@@ -21,48 +21,8 @@
                 crossorigin="anonymous">
 
         </script>
-        <script>
-            $('document').ready(function () {
-                $('.table .btn').on('click', function (event) {
-                    event.preventDefault();
-                    const href = $(this).attr('href');
-                    if ($(this).attr('id') === 'buttonEdit') {
-
-                        $.get(href, function (product) {
-                            $('#formIdEdit').val(product.id);
-                            $('#formNameEdit').val(product.name);
-                            $('#formTypeEdit').val(product.type);
-                            $('#formInStoreStockEdit').val(product.inStoreStock);
-                            $('#formOnlineStoreStockEdit').val(product.onlineStock);
-                            $('#formBackStockEdit').val(product.backStock);
-                            $('#formInStorePriceEdit').val(product.inStorePrice);
-                            $('#formOnlinePriceEdit').val(product.onlinePrice);
-
-                        });
-
-                        $('#editProductModal').modal('show');
-                    } else if ($(this).attr('id') === 'buttonDelete') {
-                        $.get(href, function (product) {
-                            $('#formIdDelete').val(product.id);
-                            $('#messageDelete').html("Do you want to delete " + product.name + "?");
-                        });
-
-                        $('#deleteProductModal').modal('show');
-                    }
-                });
-
-            });
-
-            function sortByColumn(column) {
-
-                const pageNumber = [[${pageNumber}]];
-                const pageSize = [[${pageSize}]];
-                let sortField = column;
-                const sortDirection = '[[${reverseSort}]]';
-                const keyword = '[[${keyword}]]';
-                window.location.href = `/product/page?pageNumber=${pageNumber}&pageSize=${pageSize}&sortField=${sortField}&sortDirection=${sortDirection}&keyword=${keyword}`
-            }
-        </script>
+        <script type="module" src="/js/sort.js"></script>
+        <script type="module" src="/js/product-action.js"></script>
     </head>
     <body>
         <div th:replace="~{fragments/header :: header}"></div>
@@ -107,30 +67,37 @@
             </div>
             <table class="table table-sm table-striped table-responsive table-bordered border-dark">
                 <thead class="table-dark">
+                <div id="sortData"
+                     th:data-page-number="${pageNumber}"
+                     th:data-page-size="${pageSize}"
+                     th:data-reverse-sort="${reverseSort}"
+                     th:data-base-path="@{/product/page}"
+                     th:data-keyword="${keyword}">
+                </div>
                     <tr>
                         <th>Name
-                            <a href="/" onclick="sortByColumn('name');" class="btn btn-secondary dropdown-toggle btn-sm
-                            mb-3 btn-right"></a></th>
+                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm
+                            mb-3 btn-right" data-column="name"></a></th>
                         <th>Type
-                            <a href="#" onclick="sortByColumn('type')" class="btn btn-secondary dropdown-toggle btn-sm
-                            mb-3 btn-right"></a></th>
+                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
+                                    btn-right" data-column="type"></a></th>
                         <th>In Store Stock
-                            <a href="#" onclick="sortByColumn('inStoreStock')" class="btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right"></a></th>
+                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
+                            btn-sm mb-3 btn-right" data-column="inStoreStock"></a></th>
                         <th>Online Stock
-                            <a href="#" onclick="sortByColumn('onlineStock')" class="btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right"></a></th>
+                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
+                            btn-sm mb-3 btn-right" data-column="onlineStock"></a></th>
                         <th>Back Stock
-                            <a href="#" onclick="sortByColumn('backStock')" class="btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right"></a></th>
+                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
+                            btn-sm mb-3 btn-right" data-column="backStock"></a></th>
                         <th class="align-top">Total Stock
                             </th>
                         <th>In Store Price
-                            <a href="#" onclick="sortByColumn('inStorePrice')" class="btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right"></a></th>
+                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
+                            btn-sm mb-3 btn-right" data-column="inStorePrice"></a></th>
                         <th>Online Price
-                            <a href="#" onclick="sortByColumn('onlinePrice')" class="btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right"></a></th>
+                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
+                            btn-sm mb-3 btn-right" data-column="onlinePrice"></a></th>
                         <th class="column col-sm-2 align-top">Actions</th>
                     </tr>
                 </thead>
