@@ -5,34 +5,34 @@
             pageSpecificScripts=~{:: #page-scripts}
         )}">
 </head>
-    <body>
-    <th:block id="page-scripts">
-        <script type="module" src="/js/product-action.js"></script>
-    </th:block>
-        <div th:replace="~{fragments/header :: header}"></div>
-        <div class="title-container">
-            <div class="title-logo">
-                <img class="logo" th:src="@{/images/logo.png}" alt="logo"/>
-            </div>
-            <div class="title-text">
-                <h1 th:text="${@environment.getProperty('homepage.title')}"/>
-                <h1>Product Inventory</h1>
-            </div>
-        </div>
-        <div id="sortData"
-             th:data-page-number="${page.number + 1}"
-             th:data-page-size="${page.size}"
-             th:data-keyword="${keyword}"
-             th:data-base-path="@{/product/page}"
-             th:data-sort-field="${sortField}"
-             th:data-sort-direction="${sortDirection}" >
-        </div>
-    <main>
-        <div class="container my-2">
-            <div class="d-flex justify-content-between">
-                <div class = "col-sm-1"></div>
-                <div class= "w-100">
-                    <div th:replace="~{fragments/search :: searchBar(
+<body>
+<th:block id="page-scripts">
+    <script type="module" src="/js/product-action.js"></script>
+</th:block>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="title-container">
+    <div class="title-logo">
+        <img class="logo" th:src="@{/images/logo.png}" alt="logo"/>
+    </div>
+    <div class="title-text">
+        <h1 th:text="${@environment.getProperty('homepage.title')}"/>
+        <h1>Product Inventory</h1>
+    </div>
+</div>
+<div id="sortData"
+     th:data-page-number="${page.number + 1}"
+     th:data-page-size="${page.size}"
+     th:data-keyword="${keyword}"
+     th:data-base-path="@{/product/page}"
+     th:data-sort-field="${sortField}"
+     th:data-sort-direction="${sortDirection}">
+</div>
+<main>
+    <div class="container my-2">
+        <div class="d-flex justify-content-between">
+            <div class="col-sm-1"></div>
+            <div class="w-100">
+                <div th:replace="~{fragments/search :: searchBar(
                          keyword=${keyword},
                          sortField=${sortField},
                          sortDirection=${sortDirection},
@@ -41,97 +41,154 @@
                          clearActionPath=@{'/product/'},
                          placeholderText='Search Products...'
                      )}">
-                    </div>
-                </div>
-                <div class="col-sm-2 mt-2">
-                    <button type="button" class="btn btn-primary btn-md mb-3 btn-right" data-bs-toggle="modal"
-                            data-bs-target="#addProductModal">
-                        Add Product
-                    </button>
                 </div>
             </div>
-            <table class="table table-sm table-striped table-responsive table-bordered border-dark">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Name
-                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm
-                            mb-3 btn-right" data-column="name"></a></th>
-                        <th>Type
-                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
-                                    btn-right" data-column="type"></a></th>
-                        <th>In Store Stock
-                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right" data-column="inStoreStock"></a></th>
-                        <th>Online Stock
-                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right" data-column="onlineStock"></a></th>
-                        <th>Back Stock
-                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right" data-column="backStock"></a></th>
-                        <th class="align-top">Total Stock
-                            </th>
-                        <th>In Store Price
-                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right" data-column="inStorePrice"></a></th>
-                        <th>Online Price
-                            <a href="#" class="sort-link btn btn-secondary dropdown-toggle
-                            btn-sm mb-3 btn-right" data-column="onlinePrice"></a></th>
-                        <th class="column col-sm-2 align-top">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="product : ${products}">
-                        <td th:text="${product.id}" hidden/>
-                        <td th:text="${product.name}"/>
-                        <td th:text="${product.type}"/>
-                        <td th:text="${product.inStoreStock}"/>
-                        <td th:text="${product.onlineStock}"/>
-                        <td th:text="${product.backStock}"/>
-                        <td th:text="${product.inStoreStock} + ${product.onlineStock} + ${product.backStock}"/>
-                        <td th:text="'$'+ ${product.inStorePrice}"/>
-                        <td th:text="'$'+ ${product.onlinePrice}"/>
-                        <td>
-                            <a th:href="@{/product/getProduct/__${product.id}__}"
-                               class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
-                               data-bs-target="#editProductModal">Edit</a>
-                            <a th:href="@{/product/getProduct/__${product.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"   th:attr="data-product-id=${product.id}, data-product-name=${product.name}" data-bs-toggle="modal"
-                               data-bs-target="#deleteProductModal">Delete</a> </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div th:replace="~{fragments/pagination :: paginationNav(
+            <div class="col-sm-2 mt-2">
+                <button type="button" class="btn btn-primary btn-md mb-3 btn-right" data-bs-toggle="modal"
+                        data-bs-target="#addProductModal">
+                    Add Product
+                </button>
+            </div>
+        </div>
+        <table class="table table-sm table-striped table-responsive table-bordered border-dark">
+            <thead class="table-dark">
+            <tr>
+                <th>
+                    <div class="d-flex justify-content-between align-items-center w-100"><span>Name</span>
+                        <div class="btn-group sort-btn">
+                            <button type="button" class="btn btn-sm btn-light sort-link"
+                                    th:data-column="'name'"
+                                    th:aria-label="'Sort by Name'">
+                                <i class="fas fa-sort"></i>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th>
+                    <div class="d-flex justify-content-between align-items-center w-100"><span>Type</span>
+                        <div class="btn-group sort-btn">
+                            <button type="button" class="btn btn-sm btn-light sort-link"
+                                    th:data-column="'type'"
+                                    th:aria-label="'Sort by Type'">
+                                <i class="fas fa-sort"></i>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th>
+                    <div class="d-flex justify-content-between align-items-center w-100"><span>In Store Stock</span>
+                        <div class="btn-group sort-btn">
+                            <button type="button" class="btn btn-sm btn-light sort-link"
+                                    th:data-column="'inStoreStock'"
+                                    th:aria-label="'Sort by In Store Stock'">
+                                <i class="fas fa-sort"></i>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th>
+                    <div class="d-flex justify-content-between align-items-center w-100"><span>Online Stock</span>
+                        <div class="btn-group sort-btn">
+                            <button type="button" class="btn btn-sm btn-light sort-link"
+                                    th:data-column="'onlineStock'"
+                                    th:aria-label="'Sort by Online Stock'">
+                                <i class="fas fa-sort"></i>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th>
+                    <div class="d-flex justify-content-between align-items-center w-100"><span>Back Stock</span>
+                        <div class="btn-group sort-btn">
+                            <button type="button" class="btn btn-sm btn-light sort-link"
+                                    th:data-column="'backStock'"
+                                    th:aria-label="'Sort by Back Stock'">
+                                <i class="fas fa-sort"></i>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="align-top">Total Stock
+                </th>
+                <th>
+                    <div class="d-flex justify-content-between align-items-center w-100"><span>In Store Price</span>
+                        <div class="btn-group sort-btn">
+                            <button type="button" class="btn btn-sm btn-light sort-link"
+                                    th:data-column="'inStorePrice'"
+                                    th:aria-label="'Sort by In Store Price'">
+                                <i class="fas fa-sort"></i>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th>
+                    <div class="d-flex justify-content-between align-items-center w-100"><span>Online Price</span>
+                        <div class="btn-group sort-btn">
+                            <button type="button" class="btn btn-sm btn-light sort-link"
+                                    th:data-column="'onlinePrice'"
+                                    th:aria-label="'Sort by Online Price'">
+                                <i class="fas fa-sort"></i>
+                            </button>
+                        </div>
+                    </div>
+                </th>
+                <th class="column col-sm-2 align-top">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.id}" hidden/>
+                <td th:text="${product.name}"/>
+                <td th:text="${product.type}"/>
+                <td th:text="${product.inStoreStock}"/>
+                <td th:text="${product.onlineStock}"/>
+                <td th:text="${product.backStock}"/>
+                <td th:text="${product.inStoreStock} + ${product.onlineStock} + ${product.backStock}"/>
+                <td th:text="'$'+ ${product.inStorePrice}"/>
+                <td th:text="'$'+ ${product.onlinePrice}"/>
+                <td>
+                    <a th:href="@{/product/getProduct/__${product.id}__}"
+                       class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
+                       data-bs-target="#editProductModal">Edit</a>
+                    <a th:href="@{/product/getProduct/__${product.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"
+                       th:attr="data-product-id=${product.id}, data-product-name=${product.name}" data-bs-toggle="modal"
+                       data-bs-target="#deleteProductModal">Delete</a></td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:replace="~{fragments/pagination :: paginationNav(
              page=${page},  sortField=${sortField},
              sortDirection=${sortDirection},
              keyword=${keyword},
              basePath=@{'/product/page'} )}">
-            </div>
         </div>
-    </main>
-        <div th:replace="~{fragments/modals :: formModal(
+    </div>
+</main>
+<div th:replace="~{fragments/modals :: formModal(
         modalId='addProductModal',
         modalTitle='Add Product',
         formAction=@{/product/addProduct},
         formMethod='POST',
         formBodyFragmentRef=~{fragments/forms :: productFormFields(editMode=false)}
      )}">
-        </div>
+</div>
 
-        <div th:replace="~{fragments/modals :: formModal(
+<div th:replace="~{fragments/modals :: formModal(
         modalId='editProductModal',
         modalTitle='Edit Product',
         formAction=@{/product/editProduct},
         formMethod='POST',
         formBodyFragmentRef=~{fragments/forms :: productFormFields(editMode=true)}
      )}">
-        </div>
+</div>
 
-        <div th:replace="~{fragments/modals :: deleteConfirmModal(
+<div th:replace="~{fragments/modals :: deleteConfirmModal(
         modalId='deleteProductModal',
         modalTitle='Delete Product',
         messageId='messageDeleteProduct',
         formAction=@{/product/deleteProduct},
         formInputId='formIdDeleteProduct'
      )}">
-        </div>
-    </body>
+</div>
+</body>
 </html>

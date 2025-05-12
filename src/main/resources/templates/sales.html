@@ -57,18 +57,51 @@
                     <table class="table table-sm table-striped table-responsive table-bordered border-dark">
                         <thead class="table-dark">
                         <tr>
-                            <th>Name
-                                <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
-                                    btn-right" data-column="name"></a></th>
-                            <th>Type
-                                <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
-                                    btn-right" data-column="type"></a></th>
-                            <th>Count
-                                <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm mb-3
-                                     btn-right" data-column="count"></a></th>
-                            <th>Cost Per Unit
-                                <a href="#" class="sort-link btn btn-secondary dropdown-toggle btn-sm
-                                     mb-3 btn-right" data-column="costPerUnit"></a></th>
+                            <th>
+                                <div class="d-flex justify-content-between align-items-center w-100"><span>Name</span>
+                                    <div class="btn-group sort-btn">
+                                        <button type="button" class="btn btn-sm btn-light sort-link"
+                                                th:data-column="'name'"
+                                                th:aria-label="'Sort by Name'">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex justify-content-between align-items-center w-100"><span>Type</span>
+                                    <div class="btn-group sort-btn">
+                                        <button type="button" class="btn btn-sm btn-light sort-link"
+                                                th:data-column="'type'"
+                                                th:aria-label="'Sort by Type'">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex justify-content-between align-items-center w-100"><span>Count</span>
+                                    <div class="btn-group sort-btn">
+                                        <button type="button" class="btn btn-sm btn-light sort-link"
+                                                th:data-column="'count'"
+                                                th:aria-label="'Sort by Count'">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex justify-content-between align-items-center w-100">
+                                    <span>Cost Per Item</span>
+                                    <div class="btn-group sort-btn">
+                                        <button type="button" class="btn btn-sm btn-light sort-link"
+                                                th:data-column="'costPerItem'"
+                                                th:aria-label="'Sort by Cost Per Item'">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
                             <th class="column col-sm-2 align-top">Actions</th>
                         </tr>
                         </thead>
