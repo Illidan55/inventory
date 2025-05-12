@@ -135,6 +135,7 @@ public class ItemController {
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("keyword", keyword != null ? keyword : "");
+        model.addAttribute("currentPage", "material");
 
 
         return "index";
