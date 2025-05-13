@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.scottishfolds.entity.Sale;
 import org.scottishfolds.repository.SaleRepository;
 import org.scottishfolds.requestDTO.CreateSale;
+import org.scottishfolds.requestDTO.EditSale;
+import org.scottishfolds.utility.DateUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +26,6 @@ import java.util.Optional;
 public class SaleService {
     private final SaleRepository saleRepository;
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 
     /**
      * Constructor dependency injection for SaleRepository
@@ -52,16 +53,7 @@ public class SaleService {
      */
     public void createSale(CreateSale createSale) {
         Sale sale = new Sale();
-        Instant saleInstant = null;
-        try{
-            if(createSale.getSaleDate() != null && !createSale.getSaleDate().isEmpty()){
-                LocalDate localDate = LocalDate.parse(createSale.getSaleDate(), DATE_FORMATTER);
-                saleInstant = localDate.atStartOfDay(ZoneOffset.UTC).toInstant();
-            }
-        }catch (Exception e) {
-            log.error("Error parsing date: {}", e.getMessage());
-        }
-        sale.setSaleDate(saleInstant);
+        sale.setSaleDate(DateUtils.converStringToInstant(createSale.getSaleDate()));
         sale.setName(createSale.getName());
         sale.setType(createSale.getType());
         sale.setCount(createSale.getCount());
@@ -122,5 +114,18 @@ public class SaleService {
         Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return saleRepository.findByKeyword(keyword, pageable);
+    }
+
+    public Sale generateSaleEntity(EditSale editSale) {
+        Sale sale = new Sale();
+        sale.setId(editSale.getId());
+        sale.setSaleDate(DateUtils.converStringToInstant(editSale.getSaleDate()));
+        sale.setName(editSale.getName());
+        sale.setType(editSale.getType());
+        sale.setCount(editSale.getCount());
+        sale.setLocation(editSale.getLocation() );
+        sale.setCost(editSale.getCost());
+        sale.setSalePrice(editSale.getSalePrice());
+        return sale;
     }
 }

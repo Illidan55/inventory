@@ -143,7 +143,12 @@
                         <tbody>
                         <tr th:each="sale : ${sales}">
                             <td th:text="${sale.id}" hidden/>
-                            <td th:text="${sale.saleDate}"/>
+                            <td>
+                                <span th:if="${sale.saleDate != null}"
+                                      th:text="${#temporals.format(sale.saleDate, 'MM-dd-yyyy', 'UTC')}">
+                                </span>
+                                <span th:if="${sale.saleDate == null}">N/A</span>
+                            </td>
                             <td th:text="${sale.name}"/>
                             <td th:text="${sale.type}"/>
                             <td th:text="${sale.count}"/>
@@ -155,7 +160,7 @@
                                    class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
                                    data-bs-target="#editSaleModal">Edit</a>
                                 <a th:href="@{/sales/getSale/__${sale.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"
-                                   th:attr="data-sale-id=${sale.id}, data-sale-name=${sale.name}" data-bs-toggle="modal"
+                                   th:attr="data-sale-id=${sale.id}, data-sale-name=${sale.name}, data-sale-date=${sale.saleDate}" data-bs-toggle="modal"
                                    data-bs-target="#deleteSaleModal">Delete</a>
                             </td>
 

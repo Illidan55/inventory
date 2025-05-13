@@ -3,6 +3,7 @@ package org.scottishfolds.controller;
 
 import org.scottishfolds.entity.Sale;
 import org.scottishfolds.requestDTO.CreateSale;
+import org.scottishfolds.requestDTO.EditSale;
 import org.scottishfolds.service.SaleService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,8 @@ public class SalesController {
     }
 
     @PostMapping("/editSale")
-    public String editSale(Sale sale) {
+    public String editSale(EditSale editSale) {
+        Sale sale = saleService.generateSaleEntity(editSale);
         saleService.save(sale);
         return "redirect:/sales/";
     }

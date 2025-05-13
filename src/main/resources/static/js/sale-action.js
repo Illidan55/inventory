@@ -7,8 +7,14 @@ $(document).ready(function () {
 
         if ($button.hasClass('btn-edit')) {
             $.get(href, function (sale) {
+                const dateObj = new Date(sale.saleDate); // saleDate is the Instant field from backend
+                const month = ('0' + (dateObj.getUTCMonth() + 1)).slice(-2); // Months are 0-indexed
+                const day = ('0' + dateObj.getUTCDate()).slice(-2);
+                const year = dateObj.getUTCFullYear();
+                let valueToSet = `${month}-${day}-${year}`;
+
                 $('#formIdEditSale').val(sale.id);
-                $('#formSaleDateEditSale').val(sale.saleDate);
+                $('#formSaleDateEditSale').val(valueToSet);
                 $('#formNameEditSale').val(sale.name);
                 $('#formTypeEditSale').val(sale.type);
                 $('#formCountEditSale').val(sale.count);
