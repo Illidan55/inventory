@@ -1,16 +1,16 @@
 package org.scottishfolds.controller;
 
 
-import org.scottishfolds.entity.Item;
-import org.scottishfolds.requestDTO.CreateItem;
-import org.scottishfolds.service.ItemService;
+import org.scottishfolds.entity.Sale;
+import org.scottishfolds.requestDTO.CreateSale;
+import org.scottishfolds.service.SaleService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Sales controller to handle the backend for sales
@@ -19,14 +19,11 @@ import java.util.Optional;
 @RequestMapping("/sales")
 public class SalesController {
 
-    //TODO This is a placeholder controller
-    // - Implement sales controller and service and thymeleaf frontend
 
+    private final SaleService saleService;
 
-    private final ItemService itemService;
-
-    public SalesController(ItemService itemService) {
-        this.itemService = itemService;
+    public SalesController(SaleService saleService) {
+        this.saleService = saleService;
     }
 
     @GetMapping("/") // Changed from @RequestMapping
@@ -40,59 +37,67 @@ public class SalesController {
     }
 
     @PostMapping("/addSale")
-    public String createSale(@ModelAttribute("createItem") CreateItem createItem) {
-        itemService.createItem(createItem);
+    public String createSale(@ModelAttribute("createSale") CreateSale createSale) {
+        saleService.createSale(createSale);
         return "redirect:/sales/";
     }
 
     @PostMapping("/editSale")
-    public String editSale(Item item) {
-        itemService.save(item);
+    public String editSale(Sale sale) {
+        saleService.save(sale);
         return "redirect:/sales/";
     }
 
     @GetMapping("/getSale/{id}")
     @ResponseBody
-    public Optional<Item> findById(@PathVariable(name = "id") String id) {
-        return itemService.findById(id);
+    public Optional<Sale> findById(@PathVariable(name = "id") String id) {
+        return saleService.findById(id);
     }
 
     @PostMapping("/deleteSale")
     public String deleteSale(@RequestParam String id) {
-        itemService.deleteById(id);
+        saleService.deleteById(id);
         return "redirect:/sales/";
     }
 
     @GetMapping("/page")
-    public String getPage(@RequestParam(defaultValue = "1") int pageNumber, // Added default values
+    public String getPage(@RequestParam(defaultValue = "1") int pageNumber,
                           @RequestParam(defaultValue = "10") int pageSize,
                           @RequestParam(defaultValue = "name") String sortField,
                           @RequestParam(defaultValue = "asc") String sortDirection,
                           @RequestParam(required = false) String keyword,
                           Model model) {
-        Page<Item> pageResult;
+        Page<Sale> pageResult;
 
         if (keyword != null && !keyword.isEmpty()) {
-            pageResult = itemService.findByKeyWord(pageNumber, pageSize, sortField, sortDirection, keyword);
+            pageResult = saleService.findByKeyWord(pageNumber, pageSize, sortField, sortDirection, keyword);
         } else {
-            pageResult = itemService.findAll(pageNumber, pageSize, sortField, sortDirection);
+            pageResult = saleService.findAll(pageNumber, pageSize, sortField, sortDirection);
         }
 
-        List<Item> items = pageResult.getContent();
-        // 1. Add the Page object itself to the model
-        model.addAttribute("page", pageResult); // Use "page" as the attribute name
-
-        // 2. Add the list of items separately (needed for th:each in the table)
-        model.addAttribute("items", pageResult.getContent());
-
-        // 3. Add attributes required by the fragment *parameters* that are NOT in the Page object easily
+        List<Sale> sales = pageResult.getContent();
+        model.addAttribute("page", pageResult);
+        model.addAttribute("sales", pageResult.getContent());
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("keyword", keyword != null ? keyword : "");
         model.addAttribute("currentPage", "sales");
 
 
-
         return "sales";
+    }
+
+    @GetMapping("/saleData")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getSaleData() {
+        List<String> labels = Arrays.asList("January", "February", "March", "April", "May", "June");
+        List<Integer> salesValues = Arrays.asList(150, 0, 180, 250, 200, 300);
+
+        Map<String, Object> chartData = new HashMap<>();
+        chartData.put("chartLabels", labels);
+        chartData.put("chartSalesData", salesValues);
+        chartData.put("chartTitle", "Monthly Sales Performance");
+
+        return ResponseEntity.ok(chartData);
     }
 }

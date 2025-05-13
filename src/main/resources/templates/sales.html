@@ -7,6 +7,7 @@
 </head>
 <body>
 <th:block id="page-scripts">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script type="module" src="/js/inventory-action.js"></script>
     <script type="module" src="/js/chart.js"></script>
 </th:block>
@@ -59,6 +60,17 @@
                         <thead class="table-dark">
                         <tr>
                             <th>
+                                <div class="d-flex justify-content-between align-items-center w-100"><span>Sale Date</span>
+                                    <div class="btn-group sort-btn">
+                                        <button type="button" class="btn btn-sm btn-light sort-link"
+                                                th:data-column="'saleDate'"
+                                                th:aria-label="'Sort by Sale Date'">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
                                 <div class="d-flex justify-content-between align-items-center w-100"><span>Name</span>
                                     <div class="btn-group sort-btn">
                                         <button type="button" class="btn btn-sm btn-light sort-link"
@@ -92,12 +104,34 @@
                                 </div>
                             </th>
                             <th>
-                                <div class="d-flex justify-content-between align-items-center w-100">
-                                    <span>Cost Per Item</span>
+                                <div class="d-flex justify-content-between align-items-center w-100"><span>Location</span>
                                     <div class="btn-group sort-btn">
                                         <button type="button" class="btn btn-sm btn-light sort-link"
-                                                th:data-column="'costPerItem'"
-                                                th:aria-label="'Sort by Cost Per Item'">
+                                                th:data-column="'location'"
+                                                th:aria-label="'Sort by Location'">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex justify-content-between align-items-center w-100">
+                                    <span>Cost</span>
+                                    <div class="btn-group sort-btn">
+                                        <button type="button" class="btn btn-sm btn-light sort-link"
+                                                th:data-column="'cost'"
+                                                th:aria-label="'Sort by Cost'">
+                                            <i class="fas fa-sort"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex justify-content-between align-items-center w-100"><span>Sale Price</span>
+                                    <div class="btn-group sort-btn">
+                                        <button type="button" class="btn btn-sm btn-light sort-link"
+                                                th:data-column="'salePrice'"
+                                                th:aria-label="'Sort by Sale Price'">
                                             <i class="fas fa-sort"></i>
                                         </button>
                                     </div>
@@ -107,18 +141,21 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="item : ${items}">
-                            <td th:text="${item.id}" hidden/>
-                            <td th:text="${item.name}"/>
-                            <td th:text="${item.type}"/>
-                            <td th:text="${item.count}"/>
-                            <td th:text="'$'+ ${item.costPerUnit}"/>
+                        <tr th:each="sale : ${sales}">
+                            <td th:text="${sale.id}" hidden/>
+                            <td th:text="${sale.saleDate}"/>
+                            <td th:text="${sale.name}"/>
+                            <td th:text="${sale.type}"/>
+                            <td th:text="${sale.count}"/>
+                            <td th:text="${sale.location}"/>
+                            <td th:text="'$'+ ${sale.cost}"/>
+                            <td th:text="'$'+ ${sale.salePrice}"/>
                             <td>
-                                <a th:href="@{/getItem/__${item.id}__}"
+                                <a th:href="@{/getsale/__${sale.id}__}"
                                    class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
                                    data-bs-target="#editItemModal">Edit</a>
-                                <a th:href="@{/getItem/__${item.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"
-                                   th:attr="data-item-id=${item.id}, data-item-name=${item.name}" data-bs-toggle="modal"
+                                <a th:href="@{/getsale/__${sale.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"
+                                   th:attr="data-sale-id=${sale.id}, data-sale-name=${sale.name}" data-bs-toggle="modal"
                                    data-bs-target="#deleteItemModal">Delete</a>
                             </td>
 
