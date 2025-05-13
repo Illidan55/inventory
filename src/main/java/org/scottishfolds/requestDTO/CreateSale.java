@@ -9,7 +9,7 @@ import java.time.Instant;
  */
 @Data
 public class CreateSale {
-    private Instant saleDate;
+    private String saleDate;
     private String name;
     private String type;
     private int count;

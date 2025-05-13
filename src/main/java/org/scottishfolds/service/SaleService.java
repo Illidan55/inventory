@@ -1,5 +1,6 @@
 package org.scottishfolds.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.scottishfolds.entity.Sale;
 import org.scottishfolds.repository.SaleRepository;
 import org.scottishfolds.requestDTO.CreateSale;
@@ -9,14 +10,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
  * Service for sale controller
  */
 @Service
+@Slf4j
 public class SaleService {
     private final SaleRepository saleRepository;
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 
     /**
      * Constructor dependency injection for SaleRepository
@@ -40,17 +48,26 @@ public class SaleService {
     /**
      * Create sale using the CreateSale dto
      *
-     * @param ceateSale
+     * @param createSale
      */
-    public void createSale(CreateSale ceateSale) {
+    public void createSale(CreateSale createSale) {
         Sale sale = new Sale();
-        sale.setSaleDate(ceateSale.getSaleDate());
-        sale.setName(ceateSale.getName());
-        sale.setType(ceateSale.getType());
-        sale.setCount(ceateSale.getCount());
-        sale.setLocation(ceateSale.getLocation() );
-        sale.setCost(ceateSale.getCost());
-        sale.setSalePrice(ceateSale.getSalePrice());
+        Instant saleInstant = null;
+        try{
+            if(createSale.getSaleDate() != null && !createSale.getSaleDate().isEmpty()){
+                LocalDate localDate = LocalDate.parse(createSale.getSaleDate(), DATE_FORMATTER);
+                saleInstant = localDate.atStartOfDay(ZoneOffset.UTC).toInstant();
+            }
+        }catch (Exception e) {
+            log.error("Error parsing date: {}", e.getMessage());
+        }
+        sale.setSaleDate(saleInstant);
+        sale.setName(createSale.getName());
+        sale.setType(createSale.getType());
+        sale.setCount(createSale.getCount());
+        sale.setLocation(createSale.getLocation() );
+        sale.setCost(createSale.getCost());
+        sale.setSalePrice(createSale.getSalePrice());
 
         saleRepository.save(sale);
 
