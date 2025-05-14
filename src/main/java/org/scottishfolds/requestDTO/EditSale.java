@@ -3,8 +3,6 @@ package org.scottishfolds.requestDTO;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
-import java.time.Instant;
-
 @Data
 public class EditSale {
     @Id

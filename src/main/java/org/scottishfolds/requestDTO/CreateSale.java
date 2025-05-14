@@ -2,8 +2,6 @@ package org.scottishfolds.requestDTO;
 
 import lombok.Data;
 
-import java.time.Instant;
-
 /**
  * Dto for Sale Modal
  */

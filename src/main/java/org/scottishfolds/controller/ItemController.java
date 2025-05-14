@@ -30,7 +30,7 @@ public class ItemController {
 
     /**
      * Mapping for homepage
-     *
+     * <p>
      * Note: Returns getPage with default parameters
      *
      * @param model
@@ -98,7 +98,7 @@ public class ItemController {
 
     /**
      * Method to return the model to thymeleaf.
-     *
+     * <p>
      * Allows for paging and sorting of the table
      *
      * @param pageNumber
@@ -129,7 +129,7 @@ public class ItemController {
         model.addAttribute("page", pageResult); // Use "page" as the attribute name
 
         // 2. Add the list of items separately (needed for th:each in the table)
-        model.addAttribute("items", pageResult.getContent());
+        model.addAttribute("items", items);
 
         // 3. Add attributes required by the fragment *parameters* that are NOT in the Page object easily
         model.addAttribute("sortField", sortField);

@@ -88,7 +88,7 @@ public class ItemService {
 
     /**
      * Find a page based on page, size, sortField, sortDirection and keyword
-     *
+     * <p>
      * Note: Will search both type and name columns
      *
      * @param page

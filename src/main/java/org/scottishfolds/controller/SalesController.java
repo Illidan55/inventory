@@ -30,7 +30,7 @@ public class SalesController {
     @GetMapping("/") // Changed from @RequestMapping
     public String homePage(@RequestParam(defaultValue = "1") int pageNumber,
                            @RequestParam(defaultValue = "10") int pageSize,
-                           @RequestParam(defaultValue = "name") String sortField,
+                           @RequestParam(defaultValue = "saleDate") String sortField,
                            @RequestParam(defaultValue = "asc") String sortDirection,
                            Model model) {
         // Directly call getPage, keyword is null here
@@ -65,7 +65,7 @@ public class SalesController {
     @GetMapping("/page")
     public String getPage(@RequestParam(defaultValue = "1") int pageNumber,
                           @RequestParam(defaultValue = "10") int pageSize,
-                          @RequestParam(defaultValue = "name") String sortField,
+                          @RequestParam(defaultValue = "saleDate") String sortField,
                           @RequestParam(defaultValue = "asc") String sortDirection,
                           @RequestParam(required = false) String keyword,
                           Model model) {
@@ -79,7 +79,7 @@ public class SalesController {
 
         List<Sale> sales = pageResult.getContent();
         model.addAttribute("page", pageResult);
-        model.addAttribute("sales", pageResult.getContent());
+        model.addAttribute("sales", sales);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("keyword", keyword != null ? keyword : "");

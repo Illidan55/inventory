@@ -12,10 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
@@ -52,15 +48,14 @@ public class SaleService {
      * @param createSale
      */
     public void createSale(CreateSale createSale) {
-        Sale sale = new Sale();
-        sale.setSaleDate(DateUtils.converStringToInstant(createSale.getSaleDate()));
-        sale.setName(createSale.getName());
-        sale.setType(createSale.getType());
-        sale.setCount(createSale.getCount());
-        sale.setLocation(createSale.getLocation() );
-        sale.setCost(createSale.getCost());
-        sale.setSalePrice(createSale.getSalePrice());
-
+        Sale sale = new Sale(null,
+                DateUtils.converStringToInstant(createSale.getSaleDate()),
+                createSale.getName(),
+                createSale.getType(),
+                createSale.getCount(),
+                createSale.getLocation(),
+                createSale.getCost(),
+                createSale.getSalePrice());
         saleRepository.save(sale);
 
     }
@@ -100,7 +95,7 @@ public class SaleService {
 
     /**
      * Find a page based on page, size, sortField, sortDirection and keyword
-     *
+     * <p>
      * Note: Will search both type and name columns
      *
      * @param page
@@ -117,15 +112,13 @@ public class SaleService {
     }
 
     public Sale generateSaleEntity(EditSale editSale) {
-        Sale sale = new Sale();
-        sale.setId(editSale.getId());
-        sale.setSaleDate(DateUtils.converStringToInstant(editSale.getSaleDate()));
-        sale.setName(editSale.getName());
-        sale.setType(editSale.getType());
-        sale.setCount(editSale.getCount());
-        sale.setLocation(editSale.getLocation() );
-        sale.setCost(editSale.getCost());
-        sale.setSalePrice(editSale.getSalePrice());
-        return sale;
+        return new Sale(editSale.getId(),
+                DateUtils.converStringToInstant(editSale.getSaleDate()),
+                editSale.getName(),
+                editSale.getType(),
+                editSale.getCount(),
+                editSale.getLocation(),
+                editSale.getCost(),
+                editSale.getSalePrice());
     }
 }
