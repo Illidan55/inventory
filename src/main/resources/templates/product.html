@@ -29,10 +29,8 @@
 </div>
 <main>
     <div class="container my-2">
-        <div class="d-flex justify-content-between">
-            <div class="col-sm-1"></div>
-            <div class="w-100">
-                <div th:replace="~{fragments/search :: searchBar(
+        <div class="d-flex justify-content-center align-items-center mb-3">
+            <div th:replace="~{fragments/search :: searchBar(
                          keyword=${keyword},
                          sortField=${sortField},
                          sortDirection=${sortDirection},
@@ -41,10 +39,10 @@
                          clearActionPath=@{'/product/'},
                          placeholderText='Search Products...'
                      )}">
-                </div>
             </div>
-            <div class="col-sm-2 mt-2">
-                <button type="button" class="btn btn-primary btn-md mb-3 btn-right" data-bs-toggle="modal"
+
+            <div class="ms-2">
+                <button type="button" class="btn btn-primary btn-md text-white" data-bs-toggle="modal"
                         data-bs-target="#addProductModal">
                     Add Product
                 </button>
@@ -146,13 +144,22 @@
                 <td th:text="${product.inStoreStock} + ${product.onlineStock} + ${product.backStock}"/>
                 <td th:text="'$'+ ${product.inStorePrice}"/>
                 <td th:text="'$'+ ${product.onlinePrice}"/>
-                <td>
-                    <a th:href="@{/product/getProduct/__${product.id}__}"
-                       class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
-                       data-bs-target="#editProductModal">Edit</a>
-                    <a th:href="@{/product/getProduct/__${product.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"
-                       th:attr="data-product-id=${product.id}, data-product-name=${product.name}" data-bs-toggle="modal"
-                       data-bs-target="#deleteProductModal">Delete</a></td>
+                <td class="align-middle">
+                    <div class="row gx-2">
+                        <div class="col">
+                            <a th:href="@{/product/getProduct/__${product.id}__}"
+                               class="btn btn-warning btn-md text-white btn-edit w-100" data-bs-toggle="modal"
+                               data-bs-target="#editProductModal">Edit</a>
+                        </div>
+                        <div class="col">
+                            <a th:href="@{/product/getProduct/__${product.id}__}"
+                               class="btn btn-danger btn-md text-white btn-delete w-100"
+                               th:attr="data-product-id=${product.id}, data-product-name=${product.name}"
+                               data-bs-toggle="modal"
+                               data-bs-target="#deleteProductModal">Delete</a>
+                        </div>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>

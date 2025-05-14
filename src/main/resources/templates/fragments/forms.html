@@ -102,8 +102,10 @@
   </div>
   <div class="form-group">
     <label th:for="${editMode ? 'formLocationEditSale' : 'formLocationAddSale'}" class="form-label">Name</label>
-    <input required type="text" th:id="${editMode ? 'formLocationEditSale' : 'formLocationAddSale'}" name="location" placeholder="Location"
+    <select required th:id="${editMode ? 'formLocationEditSale' : 'formLocationAddSale'}" name="location"
            class="form-control mb-4 col-4"/>
+        <option value="In Store">In Store</option>
+        <option value="Online">Online</option>
   </div>
   <div class="form-group">
     <label th:for="${editMode ? 'formCostEditSale' : 'formCostAddSale'}" class="form-label">Cost</label>

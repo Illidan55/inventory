@@ -12,7 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 /**
  * Service for sale controller
@@ -30,6 +34,15 @@ public class SaleService {
      */
     public SaleService(SaleRepository saleRepository) {
         this.saleRepository = saleRepository;
+    }
+
+    public enum SaleTimeFrame {
+        PAST_DAY,
+        PAST_WEEK,
+        PAST_MONTH,
+        PAST_3_MONTHS,
+        PAST_6_MONTHS,
+        PAST_YEAR
     }
 
     /**
@@ -120,5 +133,43 @@ public class SaleService {
                 editSale.getLocation(),
                 editSale.getCost(),
                 editSale.getSalePrice());
+    }
+    public Map<String, Object> findSalesInPastTimeFrame() {
+        Instant endDate = Instant.now();
+        Instant startDate;
+        ZonedDateTime nowInUtc = ZonedDateTime.ofInstant(endDate, ZoneOffset.UTC);
+        SaleTimeFrame timeFrame = SaleTimeFrame.PAST_6_MONTHS;
+
+        switch (timeFrame) {
+            case PAST_DAY:
+                startDate = endDate.minus(1, ChronoUnit.DAYS);
+                break;
+            case PAST_WEEK:
+                startDate = endDate.minus(1, ChronoUnit.WEEKS);
+                break;
+            case PAST_MONTH:
+                startDate = nowInUtc.minusMonths(1).toInstant();
+                break;
+            case PAST_3_MONTHS:
+                startDate = nowInUtc.minusMonths(3).toInstant();
+                break;
+            case PAST_6_MONTHS:
+                startDate = nowInUtc.minusMonths(6).toInstant();
+                break;
+            case PAST_YEAR:
+                startDate = nowInUtc.minusYears(1).toInstant();
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported time frame: " + timeFrame);
+        }
+
+        List<String> labels = List.of("January", "February", "March", "April", "May", "June");
+        List<String> salesValues = List.of("100", "200", "300", "400", "500", "600");
+
+        Map<String, Object> chartData = new HashMap<>();
+        chartData.put("chartLabels", labels);
+        chartData.put("chartSalesData", salesValues);
+        chartData.put("chartTitle", "Last 6 Month Sales");
+        return chartData;
     }
 }

@@ -2,21 +2,24 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<div th:fragment="searchBar(keyword, sortField, sortDirection, pageSize, formActionPath, clearActionPath, placeholderText)" class="w-100">
-  <form th:action="@{${formActionPath}}" id="searchForm" method="GET"> <div class="row d-flex justify-content-center">
-    <div class="col-md-6 mt-2">
-      <div class="search d-flex"> <input id="keyword" type="search" th:value="${keyword}" name="keyword" class="form-control me-2" th:placeholder="${placeholderText != null ? placeholderText : 'Enter keyword'}">
-
+<div th:fragment="searchBar(keyword, sortField, sortDirection, pageSize, formActionPath, clearActionPath, placeholderText)"
+     style="min-width: 320px; width: 100%; max-width: 1000px;">
+    <form th:action="@{${formActionPath}}" id="searchForm" method="GET" class="w-100">
+        <div class="row gx-2 align-items-center">
+            <div class="col">
+                <div class="input-group">
+                    <input id="keyword" type="search" th:value="${keyword}" name="keyword" class="form-control"
+                           th:placeholder="${placeholderText != null ? placeholderText : 'Enter keyword'}">
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                </div>
+            </div>
+            <div class="col-auto"><a th:href="@{${clearActionPath}}" class="btn btn-info text-white">Clear</a>
+            </div>
+        </div>
         <input type="hidden" name="sortField" th:value="${sortField}">
         <input type="hidden" name="sortDirection" th:value="${sortDirection}">
         <input type="hidden" name="pageSize" th:value="${pageSize}">
-
-        <button type="submit" class="btn btn-secondary btn-md">Search</button> </div>
-    </div>
-    <div class="col-md-1 mt-2">
-      <a th:href="@{${clearActionPath}}" class="btn btn-info btn-md text-white">Clear</a> </div>
-  </div>
-  </form>
+    </form>
 </div>
 
 </body>

@@ -29,10 +29,8 @@
 </div>
 <main>
     <div class="container my-2">
-        <div class="d-flex justify-content-between">
-            <div class="col-sm-1"></div>
-            <div class="w-100">
-                <div th:replace="~{fragments/search :: searchBar(
+        <div class="d-flex justify-content-center align-items-center mb-3">
+            <div th:replace="~{fragments/search :: searchBar(
                      keyword=${keyword},
                      sortField=${sortField},
                      sortDirection=${sortDirection},
@@ -41,10 +39,9 @@
                      clearActionPath=@{'/'},
                      placeholderText='Search Raw Materials...'
                  )}">
-                </div>
             </div>
-            <div class="col-sm-1 mt-2">
-                <button class="btn btn-primary btn-md mb-3 btn-right" data-bs-toggle="modal"
+            <div class="ms-2">
+                <button class="btn btn-primary btn-md text-white" data-bs-toggle="modal"
                         data-bs-target="#addItemModal">
                     Add Item
                 </button>
@@ -107,13 +104,20 @@
                 <td th:text="${item.type}"/>
                 <td th:text="${item.count}"/>
                 <td th:text="'$'+ ${item.costPerUnit}"/>
-                <td>
-                    <a th:href="@{/getItem/__${item.id}__}"
-                       class="btn btn-warning btn-sm mb-3 text-white me-3 btn-edit" data-bs-toggle="modal"
-                       data-bs-target="#editItemModal">Edit</a>
-                    <a th:href="@{/getItem/__${item.id}__}" class="btn btn-danger btn-sm mb-3 btn-delete"
-                       th:attr="data-item-id=${item.id}, data-item-name=${item.name}" data-bs-toggle="modal"
-                       data-bs-target="#deleteItemModal">Delete</a>
+                <td class="align-middle">
+                    <div class="row gx-2">
+                        <div class="col">
+                            <a th:href="@{/getItem/__${item.id}__}"
+                               class="btn btn-warning btn-md text-white btn-edit w-100" data-bs-toggle="modal"
+                               data-bs-target="#editItemModal">Edit</a>
+                        </div>
+                        <div class="col">
+                            <a th:href="@{/getItem/__${item.id}__}"
+                               class="btn btn-danger btn-md text-white btn-delete w-100"
+                               th:attr="data-item-id=${item.id}, data-item-name=${item.name}" data-bs-toggle="modal"
+                               data-bs-target="#deleteItemModal">Delete</a>
+                        </div>
+                    </div>
                 </td>
             </tr>
             </tbody>
