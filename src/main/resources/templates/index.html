@@ -103,7 +103,7 @@
                 <td th:text="${item.name}"/>
                 <td th:text="${item.type}"/>
                 <td th:text="${item.count}"/>
-                <td th:text="'$'+ ${item.costPerUnit}"/>
+                <td th:text="'$'+ ${#numbers.formatDecimal(item.costPerUnit, 1, 2)}"/>
                 <td class="align-middle">
                     <div class="row gx-2">
                         <div class="col">

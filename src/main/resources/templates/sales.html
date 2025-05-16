@@ -56,7 +56,6 @@
             <div id="chartSelect" class="ms-2 d-none d-flex align-items-center">
                 <label for="chartTimeFrameSelector" class="form-label mt-1 me-2">Chart Time Frame:</label>
                 <select id="chartTimeFrameSelector" class="form-select form-select-sm" style="width: auto;">
-                    <option value="PAST_DAY">Past Day</option>
                     <option value="PAST_WEEK" selected>Past Week</option>
                     <option value="PAST_MONTH">Past Month</option>
                     <option value="PAST_3_MONTHS">Past 3 Months</option>
@@ -167,8 +166,8 @@
                             <td th:text="${sale.type}"/>
                             <td th:text="${sale.count}"/>
                             <td th:text="${sale.location}"/>
-                            <td th:text="'$'+ ${sale.cost}"/>
-                            <td th:text="'$'+ ${sale.salePrice}"/>
+                            <td th:text="'$' + ${#numbers.formatDecimal(sale.cost, 1, 2)}"/>
+                            <td th:text="'$' + ${#numbers.formatDecimal(sale.salePrice, 1, 2)}"/>
                             <td class="align-middle">
                                 <div class="row gx-2">
                                     <div class="col">
@@ -193,7 +192,7 @@
 
                 <!-- Chart Column -->
                 <div id="chartColumn" class="col-md-6 d-none">
-                    <div>
+                    <div style="height: 60vh; min-height: 300px; position: relative;">
                         <canvas id="salesChart"></canvas>
                     </div>
                 </div>

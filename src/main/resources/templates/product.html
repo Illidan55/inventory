@@ -142,8 +142,8 @@
                 <td th:text="${product.onlineStock}"/>
                 <td th:text="${product.backStock}"/>
                 <td th:text="${product.inStoreStock} + ${product.onlineStock} + ${product.backStock}"/>
-                <td th:text="'$'+ ${product.inStorePrice}"/>
-                <td th:text="'$'+ ${product.onlinePrice}"/>
+                <td th:text="'$' + ${#numbers.formatDecimal(product.inStorePrice, 1, 2)}"/>
+                <td th:text="'$' + ${#numbers.formatDecimal(product.onlinePrice, 1, 2)}"/>
                 <td class="align-middle">
                     <div class="row gx-2">
                         <div class="col">

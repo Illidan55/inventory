@@ -91,21 +91,13 @@ public class SalesController {
 
     @GetMapping("/saleData")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getSaleData() {
-
-        return ResponseEntity.ok(saleService.findSalesInPastTimeFrame());
-    }
-    @GetMapping("/saleProfit")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getProfitData(String timeframe, String location) {
-        List<String> labels = Arrays.asList("January", "February", "March", "April", "May", "June");
-        List<Integer> salesValues = Arrays.asList(150, 0, 180, 250, 200, 300);
-
-        Map<String, Object> chartData = new HashMap<>();
-        chartData.put("chartLabels", labels);
-        chartData.put("chartSalesData", salesValues);
-        chartData.put("chartTitle", "Last 6 Month Sales");
-
+    public ResponseEntity<Map<String, Object>> getSalesAmountByTime(@RequestParam String timeframe) {
+        try {
+            SaleService.SaleTimeFrame.valueOf(timeframe.toUpperCase()); // This validates if the string is a valid enum name
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid timeframe value"));
+        }
+        Map<String, Object> chartData = saleService.getSalesDataForLineChart(timeframe);
         return ResponseEntity.ok(chartData);
     }
 }
