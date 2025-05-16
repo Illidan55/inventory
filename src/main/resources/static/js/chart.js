@@ -25,17 +25,26 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function createOrUpdateChart(serverData) {
         const labels = serverData.chartLabels || ['N/A'];
-        const dataValues = serverData.chartSalesData || [0];
+
+        const chartJsDatasets = (serverData.datasets || []).map(ds => ({
+            label: ds.label || 'Unknown Series',
+            data: ds.data || [0],
+            fill: ds.fill !== undefined ? ds.fill : false,
+            borderColor: ds.borderColor || getRandomColor(),
+            tension: ds.tension !== undefined ? ds.tension : 0.1,
+            borderWidth: ds.borderWidth !== undefined ? ds.borderWidth : 2
+        }));
+
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 200);
+            const g = Math.floor(Math.random() * 200);
+            const b = Math.floor(Math.random() * 200);
+            return `rgb(${r},${g},${b})`;
+        }
 
         const dataConfig = {
             labels: labels,
-            datasets: [{
-                label: 'Number of Sales',
-                data: dataValues,
-                fill: false,
-                borderColor: 'rgb(54, 162, 235)',
-                tension: 0.1
-            }]
+            datasets: chartJsDatasets
         };
 
         const config = {
@@ -65,11 +74,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     },
                     title: {
                         display: true,
-                        text: serverData.chartTitle || 'Sales Chart'
+                        text: serverData.chartTitle || 'Sales'
                     }
-                },
-                interaction: {
-                    intersect: false,
                 }
             }
         };
@@ -77,20 +83,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (salesChartInstance) {
             salesChartInstance.destroy();
         }
-
         salesChartInstance = new Chart(ctx, config);
     }
 
-    // Get references to the dropdown and the chart container
     const timeframeSelector = document.getElementById('chartTimeFrameSelector');
-    const chartContainer = document.getElementById('chartColumn'); // The div containing the canvas
+    const chartContainer = document.getElementById('chartColumn');
 
-    // Function to load/reload the chart based on the selected timeframe
-    // This function will be called when the dropdown changes or when the chart becomes visible.
     async function loadChart() {
-        // Only load if the timeframe selector exists and the chart container is visible
         if (!timeframeSelector || !chartContainer || chartContainer.classList.contains('d-none')) {
-            // If the chart is not visible and an instance exists, destroy it to free resources
             if (salesChartInstance && chartContainer && chartContainer.classList.contains('d-none')) {
                 salesChartInstance.destroy();
                 salesChartInstance = null;
@@ -107,38 +107,31 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Add event listener to the timeframe dropdown
     if (timeframeSelector) {
         timeframeSelector.addEventListener('change', loadChart);
     }
 
-    // Observe the chart container for visibility changes (due to toggleChartBtn)
-    // This ensures the chart loads when it's made visible.
     if (chartContainer) {
         const chartVisibilityObserver = new MutationObserver((mutationsList) => {
             for (let mutation of mutationsList) {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                     const isHidden = chartContainer.classList.contains('d-none');
-                    if (!isHidden) { // Chart became visible
+                    if (!isHidden) {
                         console.log('Chart container became visible via class change.');
-                        loadChart(); // Load or reload the chart
-                    } else { // Chart became hidden
+                        loadChart();
+                    } else {
                         if (salesChartInstance) {
                             salesChartInstance.destroy();
                             salesChartInstance = null;
                             console.log('Chart container hidden via class change, chart instance destroyed.');
                         }
                     }
-                    // No need to iterate further for this set of mutations for this specific purpose
                     return;
                 }
             }
         });
-
         chartVisibilityObserver.observe(chartContainer, { attributes: true });
 
-        // Optional: Initial load if the chart is already visible when the page loads
-        // (and not hidden by default by 'd-none' or if 'd-none' is removed by another script synchronously)
         if (!chartContainer.classList.contains('d-none') && timeframeSelector) {
             console.log('Chart container initially visible, attempting to load chart.');
             loadChart();

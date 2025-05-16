@@ -53,7 +53,8 @@ public class SaleService {
     }
 
     private static class AggregationDataPoint {
-        public String period; // This will be the "_id" from grouping (e.g., "2023-10-26")
+        public String period;
+        public String location;
         public Integer totalCount;
     }
 
@@ -157,49 +158,51 @@ public class SaleService {
     public Map<String, Object> getSalesDataForLineChart(String timeFrameString) {
         Instant now = Instant.now();
         ZonedDateTime nowZoned = ZonedDateTime.ofInstant(now, ZoneOffset.UTC);
-
         Instant endDateExclusive = nowZoned.toLocalDate().plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
 
         Instant startDateInstant;
+        ZonedDateTime startDateZonedLoop;
+
         SaleTimeFrame timeFrame = SaleTimeFrame.valueOf(timeFrameString.toUpperCase());
         String mongoGroupDateFormat;
         ChronoUnit iterationUnit;
         DateTimeFormatter javaPeriodFormatter;
 
-        ZonedDateTime startDateZoned = nowZoned.truncatedTo(ChronoUnit.DAYS);
+
+        ZonedDateTime startOfTodayZoned = nowZoned.truncatedTo(ChronoUnit.DAYS);
 
         switch (timeFrame) {
             case PAST_WEEK:
-                startDateZoned = startDateZoned.minusDays(6);
-                startDateInstant = startDateZoned.toInstant();
+                startDateZonedLoop = startOfTodayZoned.minusDays(6);
+                startDateInstant = startDateZonedLoop.toInstant();
                 mongoGroupDateFormat = "%m-%d-%Y";
                 iterationUnit = ChronoUnit.DAYS;
                 javaPeriodFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy").withZone(ZoneOffset.UTC);
                 break;
             case PAST_MONTH:
-                startDateZoned = nowZoned.truncatedTo(ChronoUnit.DAYS).minusDays(29);
-                startDateInstant = startDateZoned.toInstant();
+                startDateZonedLoop = startOfTodayZoned.minusDays(29);
+                startDateInstant = startDateZonedLoop.toInstant();
                 mongoGroupDateFormat = "%m-%d-%Y";
                 iterationUnit = ChronoUnit.DAYS;
                 javaPeriodFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy").withZone(ZoneOffset.UTC);
                 break;
             case PAST_3_MONTHS:
-                startDateZoned = nowZoned.truncatedTo(ChronoUnit.DAYS).minusMonths(2).withDayOfMonth(1);
-                startDateInstant = startDateZoned.toInstant();
+                startDateZonedLoop = startOfTodayZoned.minusMonths(2).withDayOfMonth(1);
+                startDateInstant = startDateZonedLoop.toInstant();
                 mongoGroupDateFormat = "%m-%Y";
                 iterationUnit = ChronoUnit.MONTHS;
                 javaPeriodFormatter = DateTimeFormatter.ofPattern("MM-yyyy").withZone(ZoneOffset.UTC);
                 break;
             case PAST_6_MONTHS:
-                startDateZoned = nowZoned.truncatedTo(ChronoUnit.DAYS).minusMonths(5).withDayOfMonth(1);
-                startDateInstant = startDateZoned.toInstant();
+                startDateZonedLoop = startOfTodayZoned.minusMonths(5).withDayOfMonth(1);
+                startDateInstant = startDateZonedLoop.toInstant();
                 mongoGroupDateFormat = "%m-%Y";
                 iterationUnit = ChronoUnit.MONTHS;
                 javaPeriodFormatter = DateTimeFormatter.ofPattern("MM-yyyy").withZone(ZoneOffset.UTC);
                 break;
             case PAST_YEAR:
-                startDateZoned = nowZoned.truncatedTo(ChronoUnit.DAYS).minusMonths(11).withDayOfMonth(1);
-                startDateInstant = startDateZoned.toInstant();
+                startDateZonedLoop = startOfTodayZoned.minusMonths(11).withDayOfMonth(1);
+                startDateInstant = startDateZonedLoop.toInstant();
                 mongoGroupDateFormat = "%m-%Y";
                 iterationUnit = ChronoUnit.MONTHS;
                 javaPeriodFormatter = DateTimeFormatter.ofPattern("MM-yyyy").withZone(ZoneOffset.UTC);
@@ -207,25 +210,28 @@ public class SaleService {
             default:
                 log.warn("Unsupported time frame: {}, defaulting to PAST_WEEK", timeFrameString);
                 timeFrame = SaleTimeFrame.PAST_WEEK;
-                startDateZoned = nowZoned.truncatedTo(ChronoUnit.DAYS).minusDays(6);
-                startDateInstant = startDateZoned.toInstant();
+                startDateZonedLoop = startOfTodayZoned.minusDays(6);
+                startDateInstant = startDateZonedLoop.toInstant();
                 mongoGroupDateFormat = "%m-%d-%Y";
                 iterationUnit = ChronoUnit.DAYS;
                 javaPeriodFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy").withZone(ZoneOffset.UTC);
         }
 
+        // --- Aggregation Pipeline ---
         MatchOperation matchOperation = Aggregation.match(
                 Criteria.where("saleDate").gte(Date.from(startDateInstant)).lt(endDateExclusive)
         );
-        ProjectionOperation projectDateForGrouping = Aggregation.project("count")
-                .and(DateOperators.DateToString.dateOf("saleDate").toString(mongoGroupDateFormat).withTimezone(DateOperators.Timezone.valueOf("UTC"))).as("groupingPeriod");
-        GroupOperation groupOperation = Aggregation.group("groupingPeriod")
+        ProjectionOperation projectFieldsForGrouping = Aggregation.project("count", "location")
+                .and(DateOperators.DateToString.dateOf("saleDate").toString(mongoGroupDateFormat).withTimezone(DateOperators.Timezone.valueOf("UTC"))).as("period");
+        GroupOperation groupOperation = Aggregation.group(Fields.fields("period", "location"))
                 .sum("count").as("totalCount");
-        SortOperation sortOperation = Aggregation.sort(Sort.Direction.ASC, "_id");
-        ProjectionOperation projectToMatchDTO = Aggregation.project("totalCount").and("_id").as("period");
+        ProjectionOperation projectToMatchDTO = Aggregation.project("totalCount")
+                .and("_id.period").as("period")
+                .and("_id.location").as("location");
+        SortOperation sortOperation = Aggregation.sort(Sort.Direction.ASC, "period", "location");
 
         Aggregation aggregation = Aggregation.newAggregation(
-                matchOperation, projectDateForGrouping, groupOperation, sortOperation, projectToMatchDTO
+                matchOperation, projectFieldsForGrouping, groupOperation, projectToMatchDTO, sortOperation
         );
 
         AggregationResults<AggregationDataPoint> results = mongoTemplate.aggregate(
@@ -233,32 +239,68 @@ public class SaleService {
         );
         List<AggregationDataPoint> aggregatedDataFromDB = results.getMappedResults();
 
+        // --- Zero-Fill Logic and Data Structuring for Multiple Lines ---
+        LinkedHashMap<String, Integer> inStoreSalesMap = new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> onlineSalesMap = new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> totalSalesMap = new LinkedHashMap<>();
 
-        LinkedHashMap<String, Integer> salesByPeriodMap = new LinkedHashMap<>();
-        ZonedDateTime currentLoopDate = startDateZoned; // Start iterating from the calculated ZonedDateTime start
+        List<String> chartLabels = new ArrayList<>();
+        ZonedDateTime currentLoopDate = startDateZonedLoop;
 
         while (currentLoopDate.toInstant().isBefore(endDateExclusive)) {
             String periodKey = currentLoopDate.format(javaPeriodFormatter);
-            salesByPeriodMap.put(periodKey, 0);
+
+            chartLabels.add(periodKey);
+            inStoreSalesMap.put(periodKey, 0);
+            onlineSalesMap.put(periodKey, 0);
+            totalSalesMap.put(periodKey, 0);
 
             currentLoopDate = currentLoopDate.plus(1, iterationUnit);
         }
 
+        // Populate maps with actual sales data from aggregation
         for (AggregationDataPoint point : aggregatedDataFromDB) {
-            if (point.period != null) {
-                salesByPeriodMap.put(point.period, point.totalCount);
+            String period = point.period;
+            String location = point.location;
+            Integer count = point.totalCount != null ? point.totalCount : 0;
+
+            // Ensure the period from DB data exists in our generated labels/map keys
+            if (location != null && period != null && totalSalesMap.containsKey(period)) {
+                totalSalesMap.compute(period, (p, currentTotal) -> (currentTotal == null ? 0 : currentTotal) + count);
+
+                if ("In Store".equalsIgnoreCase(location)) {
+                    inStoreSalesMap.compute(period, (p, currentLocTotal) -> (currentLocTotal == null ? 0 : currentLocTotal) + count);
+                } else if ("Online".equalsIgnoreCase(location)) {
+                    onlineSalesMap.compute(period, (p, currentLocTotal) -> (currentLocTotal == null ? 0 : currentLocTotal) + count);
+                }
             }
         }
 
-        List<String> chartLabels = new ArrayList<>(salesByPeriodMap.keySet());
-        List<Integer> chartSalesData = new ArrayList<>(salesByPeriodMap.values());
+        List<Map<String, Object>> datasets = new ArrayList<>();
+        datasets.add(createDatasetForChart("In Store", new ArrayList<>(inStoreSalesMap.values()), "rgb(255, 99, 132)"));
+        datasets.add(createDatasetForChart("Online", new ArrayList<>(onlineSalesMap.values()), "rgb(54, 162, 235)"));
+        datasets.add(createDatasetForChart("Total", new ArrayList<>(totalSalesMap.values()), "rgb(75, 192, 192)"));
 
         Map<String, Object> chartData = new HashMap<>();
         chartData.put("chartLabels", chartLabels);
-        chartData.put("chartSalesData", chartSalesData);
-        chartData.put("chartTitle", "Sales - " + timeFrame.toString().replace("_", " ").toLowerCase());
+        chartData.put("datasets", datasets);
+        chartData.put("chartTitle", "Sales Comparison - " + timeFrame.toString().replace("_", " ").toLowerCase());
 
+        log.info("Chart data for {}: {} labels (zero-filled). Range: {} to {}. MongoFormat: {}",
+                timeFrameString, chartLabels.size(), startDateInstant, endDateExclusive, mongoGroupDateFormat);
         return chartData;
+    }
+
+    // Helper method to create a dataset map structure for Chart.js
+    private Map<String, Object> createDatasetForChart(String label, List<Integer> data, String borderColor) {
+        Map<String, Object> dataset = new HashMap<>();
+        dataset.put("label", label);
+        dataset.put("data", data);
+        dataset.put("fill", false);
+        dataset.put("borderColor", borderColor);
+        dataset.put("tension", 0.1);
+        dataset.put("borderWidth", 2);
+        return dataset;
     }
 }
 
