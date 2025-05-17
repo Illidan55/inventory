@@ -35,7 +35,6 @@ public class SalesController {
                            @RequestParam(defaultValue = "saleDate") String sortField,
                            @RequestParam(defaultValue = "asc") String sortDirection,
                            Model model) {
-        // Directly call getPage, keyword is null here
         return getPage(pageNumber, pageSize, sortField, sortDirection, null, model);
     }
 
@@ -94,7 +93,7 @@ public class SalesController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getSaleChartData(@RequestParam String timeframe) {
         try {
-            SaleService.SaleTimeFrame.valueOf(timeframe.toUpperCase()); // This validates if the string is a valid enum name
+            SaleService.SaleTimeFrame.valueOf(timeframe.toUpperCase());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid timeframe value"));
         }

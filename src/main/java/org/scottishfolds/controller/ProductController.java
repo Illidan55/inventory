@@ -43,7 +43,6 @@ public class ProductController {
                            @RequestParam(defaultValue = "name") String sortField,
                            @RequestParam(defaultValue = "asc") String sortDirection,
                            Model model) {
-        // Directly call getPage, keyword is null here
         return getPage(pageNumber, pageSize, sortField, sortDirection, null, model);
 
     }
@@ -125,13 +124,8 @@ public class ProductController {
         }
 
         List<Product> products = pageResult.getContent();
-        // 1. Add the Page object itself to the model
-        model.addAttribute("page", pageResult); // Use "page" as the attribute name
-
-        // 2. Add the list of items separately (needed for th:each in the table)
+        model.addAttribute("page", pageResult);
         model.addAttribute("products", products);
-
-        // 3. Add attributes required by the fragment *parameters* that are NOT in the Page object easily
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("keyword", keyword != null ? keyword : "");

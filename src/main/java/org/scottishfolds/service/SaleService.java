@@ -332,7 +332,7 @@ public class SaleService {
      * @param data         the data points to be used in the chart, provided as a list of numbers
      * @param borderColor  the color of the border for the chart line in the dataset
      * @return a map containing the dataset configuration with properties such as label, data, fill,
-     *         border color, tension, and border width
+     *         border color, tension and border width
      */
     private Map<String, Object> createDatasetForChart(String label, List<? extends Number> data, String borderColor) {
         Map<String, Object> dataset = new HashMap<>();
