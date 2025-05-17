@@ -1,31 +1,48 @@
-// chart.js
+// In chart.js
 document.addEventListener('DOMContentLoaded', async function () {
+    // --- Setup for First Chart (Sales Count) ---
     const salesChartCanvas = document.getElementById('salesChart');
-    if (!salesChartCanvas) {
+    let salesCtx;
+    if (salesChartCanvas) {
+        salesCtx = salesChartCanvas.getContext('2d');
+    } else {
         console.error('Sales chart canvas element not found!');
-        return;
     }
-    const ctx = salesChartCanvas.getContext('2d');
-    let salesChartInstance;
 
-    async function fetchChartData(timeframe = 'PAST_WEEK') {
+    // --- Setup for Second Chart (Revenue) ---
+    const revenueChartCanvas = document.getElementById('revenueChartCanvas');
+    let revenueCtx;
+    if (revenueChartCanvas) {
+        revenueCtx = revenueChartCanvas.getContext('2d');
+    } else {
+        console.error('Revenue chart canvas element not found!');
+    }
+
+    let chartInstances = { // Store chart instances
+        sales: null,
+        revenue: null
+    };
+
+    // --- Generic Fetch Function (fetchDataForChart - remains the same) ---
+    async function fetchDataForChart(endpoint, timeframe = 'PAST_WEEK') {
         try {
-            const response = await fetch('/sales/saleData?timeframe=' + timeframe);
+            const response = await fetch(`${endpoint}?timeframe=${timeframe}`);
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                throw new Error(`HTTP error! Status: ${response.status} for ${endpoint}`);
             }
             const chartDataFromServer = await response.json();
-            console.log('Fetched chart data:', chartDataFromServer);
+            console.log(`Workspaceed data for ${endpoint} with timeframe ${timeframe}:`, chartDataFromServer);
             return chartDataFromServer;
         } catch (error) {
-            console.error('Error fetching chart data:', error);
-            return { chartLabels: ['Error'], chartSalesData: [0] };
+            console.error(`Error fetching data for ${endpoint}:`, error);
+            return {chartLabels: ['Error'], datasets: [{label: 'Error', data: [0]}], chartTitle: 'Error Loading Data'};
         }
     }
 
-    function createOrUpdateChart(serverData) {
+    // --- Generic Create/Update Chart Function (createOrUpdateGenericChart - remains the same) ---
+    function createOrUpdateGenericChart(ctx, chartInstance, serverData, defaultTitle, yAxisLabel, yTickFormatter, tooltipLabelFormatter) {
+        if (!ctx) return null;
         const labels = serverData.chartLabels || ['N/A'];
-
         const chartJsDatasets = (serverData.datasets || []).map(ds => ({
             label: ds.label || 'Unknown Series',
             data: ds.data || [0],
@@ -46,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             labels: labels,
             datasets: chartJsDatasets
         };
-
         const config = {
             type: 'line',
             data: dataConfig,
@@ -57,84 +73,161 @@ document.addEventListener('DOMContentLoaded', async function () {
                     y: {
                         beginAtZero: true,
                         title: {
-                            display: true,
-                            text: 'Sales'
+                        display: true,
+                            text: yAxisLabel
+                        },
+                        ticks: {
+                            callback: yTickFormatter || function(value) {
+                                return value;
+                            }
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'Time'
+                            text: 'Time Period'
                         }
                     }
                 },
                 plugins: {
                     legend: {
-                        position: 'top',
+                        position: 'top'
                     },
                     title: {
                         display: true,
-                        text: serverData.chartTitle || 'Sales'
+                        text: serverData.chartTitle || defaultTitle
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: tooltipLabelFormatter || function(tooltipItem) {
+                                let label = tooltipItem.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (tooltipItem.parsed.y !== null) {
+                                    label += tooltipItem.parsed.y;
+                                }
+                                return label;
+                            }
+                        }
                     }
                 }
             }
         };
-
-        if (salesChartInstance) {
-            salesChartInstance.destroy();
-        }
-        salesChartInstance = new Chart(ctx, config);
+        if (chartInstance) {
+            chartInstance.destroy();
+        } // Destroy previous instance by direct reference
+        return new Chart(ctx, config); // Return new instance
     }
 
-    const timeframeSelector = document.getElementById('chartTimeFrameSelector');
-    const chartContainer = document.getElementById('chartColumn');
+    // --- Load Functions for Each Chart ---
+    const timeframeSelector = document.getElementById('chartTimeFrameSelector'); // Ensure timeframeSelector is defined here
 
-    async function loadChart() {
-        if (!timeframeSelector || !chartContainer || chartContainer.classList.contains('d-none')) {
-            if (salesChartInstance && chartContainer && chartContainer.classList.contains('d-none')) {
-                salesChartInstance.destroy();
-                salesChartInstance = null;
-                console.log('Chart hidden, instance destroyed.');
+    async function loadSalesCountChart() {
+        const combinedContainer = document.getElementById('combinedChartColumn');
+        if (!salesCtx || !timeframeSelector || !combinedContainer || combinedContainer.classList.contains('d-none')) {
+            if (chartInstances.sales) {
+                chartInstances.sales.destroy();
+                chartInstances.sales = null;
             }
             return;
         }
-
         const selectedTimeframe = timeframeSelector.value;
-        console.log(`Loading chart for timeframe: ${selectedTimeframe}`);
-        const chartData = await fetchChartData(selectedTimeframe);
-        if (chartData) {
-            createOrUpdateChart(chartData);
+        const salesData = await fetchDataForChart('/sales/saleChart', selectedTimeframe);
+        if (salesData) {
+            chartInstances.sales = createOrUpdateGenericChart(salesCtx, chartInstances.sales, salesData, 'Sales Over Time', 'Number of Sales');
+        }
+    }
+
+    async function loadRevenueChart() {
+        const combinedContainer = document.getElementById('combinedChartColumn');
+        if (!revenueCtx || !timeframeSelector || !combinedContainer || combinedContainer.classList.contains('d-none')) {
+            if (chartInstances.revenue) {
+                chartInstances.revenue.destroy();
+                chartInstances.revenue = null;
+            }
+            return;
+        }
+        const selectedTimeframe = timeframeSelector.value;
+        const revenueData = await fetchDataForChart('/sales/revenueChart', selectedTimeframe);
+        if (revenueData) {
+            const yTickCurrencyFormatter = function(value) {
+                if (typeof value === 'number') {
+                    return '$' + value.toFixed(2);
+                }
+                return value;
+            };
+
+            // Currency formatter for tooltip labels
+            const tooltipCurrencyFormatter = function(tooltipItem) {
+                let label = tooltipItem.dataset.label || '';
+                if (label) {
+                    label += ': ';
+                }
+                if (tooltipItem.parsed.y !== null && typeof tooltipItem.parsed.y === 'number') {
+                    label += '$' + tooltipItem.parsed.y.toFixed(2);
+                } else if (tooltipItem.parsed.y !== null) {
+                    label += tooltipItem.parsed.y;
+                }
+                return label;
+            };
+
+            chartInstances.revenue = createOrUpdateGenericChart(
+                revenueCtx,
+                chartInstances.revenue,
+                revenueData,
+                'Sales Revenue Over Time', // More descriptive title
+                'Total Revenue', // The tick formatter will add the '$' symbol
+                yTickCurrencyFormatter,    // Pass the Y-axis tick formatter
+                tooltipCurrencyFormatter   // Pass the tooltip label formatter
+            );
         }
     }
 
     if (timeframeSelector) {
-        timeframeSelector.addEventListener('change', loadChart);
+        timeframeSelector.addEventListener('change', () => {
+            const combinedContainer = document.getElementById('combinedChartColumn');
+            if (combinedContainer && !combinedContainer.classList.contains('d-none')) {
+                loadSalesCountChart();
+                loadRevenueChart();
+            }
+        });
     }
 
-    if (chartContainer) {
-        const chartVisibilityObserver = new MutationObserver((mutationsList) => {
+    // --- Mutation Observer for Visibility of the Combined Chart Column ---
+    const combinedChartContainer = document.getElementById('combinedChartColumn');
+    if (combinedChartContainer) {
+        const observer = new MutationObserver((mutationsList) => {
             for (let mutation of mutationsList) {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    const isHidden = chartContainer.classList.contains('d-none');
+                    const isHidden = combinedChartContainer.classList.contains('d-none');
                     if (!isHidden) {
-                        console.log('Chart container became visible via class change.');
-                        loadChart();
+                        console.log('Combined chart column became visible.');
+                        if (timeframeSelector) { // Ensure selector exists before trying to load
+                            loadSalesCountChart();
+                            loadRevenueChart();
+                        }
                     } else {
-                        if (salesChartInstance) {
-                            salesChartInstance.destroy();
-                            salesChartInstance = null;
-                            console.log('Chart container hidden via class change, chart instance destroyed.');
+                        console.log('Combined chart column hidden.');
+                        if (chartInstances.sales) {
+                            chartInstances.sales.destroy();
+                            chartInstances.sales = null;
+                        }
+                        if (chartInstances.revenue) {
+                            chartInstances.revenue.destroy();
+                            chartInstances.revenue = null;
                         }
                     }
                     return;
                 }
             }
         });
-        chartVisibilityObserver.observe(chartContainer, { attributes: true });
+        observer.observe(combinedChartContainer, {attributes: true});
 
-        if (!chartContainer.classList.contains('d-none') && timeframeSelector) {
-            console.log('Chart container initially visible, attempting to load chart.');
-            loadChart();
+        if (!combinedChartContainer.classList.contains('d-none') && timeframeSelector) {
+            console.log('Combined chart column initially visible.');
+            loadSalesCountChart();
+            loadRevenueChart();
         }
     }
 });

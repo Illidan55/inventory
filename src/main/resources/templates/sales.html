@@ -191,9 +191,18 @@
                 </div>
 
                 <!-- Chart Column -->
-                <div id="chartColumn" class="col-md-6 d-none">
-                    <div style="height: 60vh; min-height: 300px; position: relative;">
-                        <canvas id="salesChart"></canvas>
+                <div id="combinedChartColumn" class="col-md-6 d-none">
+
+                    <div id="salesChartContainer" class="mb-3">
+                        <div style="height: 37vh; min-height: 280px; position: relative;">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="revenueChartContainer">
+                        <div style="height: 37vh; min-height: 280px; position: relative;">
+                            <canvas id="revenueChartCanvas"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 package org.scottishfolds.controller;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.scottishfolds.entity.Sale;
 import org.scottishfolds.requestDTO.CreateSale;
 import org.scottishfolds.requestDTO.EditSale;
@@ -18,6 +19,7 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("/sales")
+@Slf4j
 public class SalesController {
 
 
@@ -45,8 +47,7 @@ public class SalesController {
 
     @PostMapping("/editSale")
     public String editSale(EditSale editSale) {
-        Sale sale = saleService.generateSaleEntity(editSale);
-        saleService.save(sale);
+        saleService.updateSale(editSale);
         return "redirect:/sales/";
     }
 
@@ -89,15 +90,26 @@ public class SalesController {
         return "sales";
     }
 
-    @GetMapping("/saleData")
+    @GetMapping("/saleChart")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getSalesAmountByTime(@RequestParam String timeframe) {
+    public ResponseEntity<Map<String, Object>> getSaleChartData(@RequestParam String timeframe) {
         try {
             SaleService.SaleTimeFrame.valueOf(timeframe.toUpperCase()); // This validates if the string is a valid enum name
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid timeframe value"));
         }
         Map<String, Object> chartData = saleService.getSalesDataForLineChart(timeframe);
+        return ResponseEntity.ok(chartData);
+    }
+    @GetMapping("/revenueChart")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getRevenueChartData(@RequestParam String timeframe) {
+        try {
+            SaleService.SaleTimeFrame.valueOf(timeframe.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid timeframe value: " + timeframe));
+        }
+        Map<String, Object> chartData = saleService.getRevenueDataForLineChart(timeframe);
         return ResponseEntity.ok(chartData);
     }
 }
