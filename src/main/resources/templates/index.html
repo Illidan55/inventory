@@ -46,6 +46,12 @@
                     Add Item
                 </button>
             </div>
+            <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileSelectAndUpload(event)">
+            <div class="import-button-container ms-2">
+                <button class="btn btn-primary btn-md text-white" onclick="triggerFileInput()">
+                    Import
+                </button>
+            </div>
         </div>
         <table class="table table-sm table-striped table-responsive table-bordered border-dark">
             <thead class="table-dark">

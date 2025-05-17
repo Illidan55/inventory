@@ -53,3 +53,6 @@
 #chartColumn {
     position: relative;
 }
+#csvFileInput {
+    display: none;
+}
