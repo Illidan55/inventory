@@ -148,8 +148,16 @@ public class ProductService {
                     product.setOnlineStock(Integer.parseInt(values[4].trim()));
 
                     try {
-                        product.setInStorePrice(Float.parseFloat(values[5].trim()));
-                        product.setOnlinePrice(Float.parseFloat(values[6].trim()));
+                        String inStorePriceStr = values[5].trim();
+                        if(inStorePriceStr.contains("$")) {
+                            inStorePriceStr = inStorePriceStr.replace("$", "");
+                        }
+                        product.setInStorePrice(Float.parseFloat(inStorePriceStr));
+                        String onlinePriceStr = values[6].trim();
+                        if(onlinePriceStr.contains("$")) {
+                            onlinePriceStr = onlinePriceStr.replace("$", "");
+                        }
+                        product.setOnlinePrice(Float.parseFloat(onlinePriceStr));
                     } catch (NumberFormatException e) {
                         log.error("Skipping row due to invalid float format: {}. Error: {}", line, e.getMessage());
                         continue;

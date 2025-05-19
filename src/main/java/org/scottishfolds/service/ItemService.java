@@ -142,7 +142,12 @@ public class ItemService {
                     item.setType(values[1].trim());
                     item.setCount(Integer.parseInt(values[2].trim()));
                     try {
-                        item.setCostPerUnit(Float.parseFloat(values[3].trim()));
+                        String costPerUnitStr = values[3].trim();
+                        if(costPerUnitStr.contains("$")) {
+                            costPerUnitStr = costPerUnitStr.replace("$", "");
+                        }
+
+                        item.setCostPerUnit(Float.parseFloat(costPerUnitStr));
                     } catch (NumberFormatException e) {
                         log.error("Skipping row due to invalid float format: {}. Error: {}", line, e.getMessage());
                         continue;

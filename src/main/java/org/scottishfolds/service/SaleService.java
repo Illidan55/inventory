@@ -321,8 +321,6 @@ public class SaleService {
         chartData.put("datasets", datasets);
         chartData.put("chartTitle", "Sales Comparison - " + aggregationInfo.timeFrame.toString().replace("_", " ").toLowerCase());
 
-        log.info("Chart data for {}: {} labels (zero-filled). Range: {} to {}. MongoFormat: {}",
-                timeFrameString, chartLabels.size(), aggregationInfo.startDateInstant, aggregationInfo.endDateExclusive, aggregationInfo.mongoGroupDateFormat);
         return chartData;
     }
 
@@ -460,8 +458,16 @@ public class SaleService {
                     sale.setLocation(values[4].trim());
 
                     try {
-                        sale.setCost(Float.parseFloat(values[5].trim()));
-                        sale.setSalePrice(Float.parseFloat(values[6].trim()));
+                        String costString = values[5].trim();
+                        if(costString.contains("$")){
+                            costString = costString.replace("$", "");
+                        }
+                        sale.setCost(Float.parseFloat(costString));
+                        String salePriceString = values[6].trim();
+                        if(salePriceString.contains("$")){
+                            salePriceString = salePriceString.replace("$", "");
+                        }
+                        sale.setSalePrice(Float.parseFloat(salePriceString));
                     } catch (NumberFormatException e) {
                         log.error("Skipping row due to invalid float format: {}. Error: {}", line, e.getMessage());
                         continue;
