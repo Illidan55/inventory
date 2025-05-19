@@ -16,3 +16,4 @@ spring:
 
 homepage:
   title: ${TITLE}
+  logoPath: /images/default/logo.png

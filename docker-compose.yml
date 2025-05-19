@@ -1,0 +1,16 @@
+services:
+  inventory:
+    image: inventory:latest
+    container_name: inventory
+    ports:
+      - "8004:8080"
+    ipc: host
+    env_file:
+      - dev.env
+    networks:
+      - external_network
+    restart: unless-stopped
+networks:
+  external_network:
+    external: true
+    name: mongo0
