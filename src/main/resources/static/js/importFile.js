@@ -2,6 +2,11 @@ function triggerFileInput() {
     document.getElementById('csvFileInput').click();
 }
 async function handleFileSelectAndUpload(event) {
+    const pathData = document.getElementById('pathData');
+    if (!pathData) {
+        console.error('CRITICAL: pathData element not found in the DOM.');
+        return;
+    }
     const fileInput = event.target;
 
     if (fileInput.files.length === 0) {
@@ -15,7 +20,8 @@ async function handleFileSelectAndUpload(event) {
     console.log(`Preparing to upload: ${file.name}`);
 
     try {
-        const response = await fetch('/import', {
+        const basePath = pathData.dataset.basePath;
+        const response = await fetch(basePath +'import', {
             method: 'POST',
             body: formData,
         });

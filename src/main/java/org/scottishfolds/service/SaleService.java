@@ -14,7 +14,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -47,13 +51,11 @@ public class SaleService {
      * The SaleTimeFrame enum represents predefined time frames used
      * for categorizing and analyzing sales data over specific periods.
      * It provides constants for various common durations, such as:
-     *
      * - PAST_WEEK: Sales data from the last 7 days.
      * - PAST_MONTH: Sales data from the last 30 days approximately.
      * - PAST_3_MONTHS: Sales data from the last 3 months.
      * - PAST_6_MONTHS: Sales data from the last 6 months.
      * - PAST_YEAR: Sales data from the last 12 months.
-     *
      * This enum can be utilized in applications requiring time-based
      * filtering or reporting of sales metrics.
      */
@@ -170,7 +172,7 @@ public class SaleService {
      * @param sortField the field by which to sort the results
      * @param sortDirection the direction of sorting (ASC for ascending, DESC for descending)
      * @param keyword the keyword to search for
-     * @return a Page of sales that match the keyword, sorted and paginated according to the specified parameters
+     * @return a Page of sales that match the keyword, sorted, and page
      */
     public Page<Sale> findByKeyWord(int page, int size, String sortField, String sortDirection, String keyword) {
         Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
@@ -422,9 +424,59 @@ public class SaleService {
         chartData.put("chartLabels", chartLabels);
         chartData.put("datasets", datasets);
         chartData.put("chartTitle", "Revenue Comparison - " + aggregationInfo.timeFrame.toString().replace("_", " ").toLowerCase());
-        log.info("Revenue Chart data for {}: {} labels. Range: {} to {}. MongoFormat: {}",
-                timeFrameString, chartLabels.size(), aggregationInfo.startDateInstant, aggregationInfo.endDateExclusive, aggregationInfo.mongoGroupDateFormat);
         return chartData;
+    }
+    /**
+     * Imports sales from a CSV file.
+     * Assumes CSV format: saleDate, name, type, count, location, cost, salePrice
+     *
+     * @param file The CSV file to import.
+     * @throws IOException If an error occurs during file reading.
+     * @throws IllegalArgumentException If the file data is not as expected.
+     */
+    public void importSalesFromCSV(MultipartFile file) throws IOException {
+        List<Sale> salesToSave = new ArrayList<>();
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("CSV file is empty.");
+        }
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String line;
+            boolean isHeader = true;
+
+            while ((line = br.readLine()) != null) {
+                if (isHeader) {
+                    isHeader = false;
+                    continue;
+                }
+
+                String[] values = line.split(",");
+                if (values.length == 7) {
+                    Sale sale = new Sale();
+                    sale.setSaleDate(DateUtils.converStringToInstant(values[0].trim()));
+                    sale.setName(values[1].trim());
+                    sale.setType(values[2].trim());
+                    sale.setCount(Integer.parseInt(values[3].trim()));
+                    sale.setLocation(values[4].trim());
+
+                    try {
+                        sale.setCost(Float.parseFloat(values[5].trim()));
+                        sale.setSalePrice(Float.parseFloat(values[6].trim()));
+                    } catch (NumberFormatException e) {
+                        log.error("Skipping row due to invalid float format: {}. Error: {}", line, e.getMessage());
+                        continue;
+                    }
+                    salesToSave.add(sale);
+                } else {
+                    log.error("Skipping malformed CSV row: {}", line);
+                }
+            }
+        }
+
+        if (!salesToSave.isEmpty()) {
+            saleRepository.saveAll(salesToSave);
+
+        }
     }
 }
 

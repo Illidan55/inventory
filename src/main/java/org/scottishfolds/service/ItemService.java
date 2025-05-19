@@ -1,5 +1,6 @@
 package org.scottishfolds.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.scottishfolds.entity.Item;
 import org.scottishfolds.repository.ItemRepository;
 import org.scottishfolds.requestDTO.CreateItem;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * Service for item controller
  */
 @Service
+@Slf4j
 public class ItemService {
     private final ItemRepository itemRepository;
 
@@ -134,7 +136,7 @@ public class ItemService {
                 }
 
                 String[] values = line.split(",");
-                if (values.length >= 3) {
+                if (values.length == 4) {
                     Item item = new Item();
                     item.setName(values[0].trim());
                     item.setType(values[1].trim());
@@ -142,12 +144,12 @@ public class ItemService {
                     try {
                         item.setCostPerUnit(Float.parseFloat(values[3].trim()));
                     } catch (NumberFormatException e) {
-                        System.err.println("Skipping row due to invalid costPerUnit format: " + line + ". Error: " + e.getMessage());
+                        log.error("Skipping row due to invalid float format: {}. Error: {}", line, e.getMessage());
                         continue;
                     }
                     itemsToSave.add(item);
                 } else {
-                    System.err.println("Skipping malformed CSV row: " + line);
+                    log.error("Skipping malformed CSV row: {}", line);
                 }
             }
         }

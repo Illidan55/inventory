@@ -19,6 +19,9 @@
         <h1>Raw Material Inventory</h1>
     </div>
 </div>
+<div id="pathData"
+     th:data-base-path="@{/}">
+</div>
 <div id="sortData"
      th:data-page-number="${page?.number != null ? page.number + 1 : '1'}"
      th:data-page-size="${page?.size != null ? page.size : '10'}"

@@ -22,6 +22,9 @@
         <h1>Sales</h1>
     </div>
 </div>
+<div id="pathData"
+     th:data-base-path="@{/sales/}">
+</div>
 <div id="sortData"
      th:data-page-number="${page.number + 1}"
      th:data-page-size="${page.size}"
@@ -48,6 +51,12 @@
             <div class="ms-2">
                 <button type="button" class="btn btn-primary btn-md text-white" data-bs-toggle="modal" data-bs-target="#addSaleModal">
                     Add Sale
+                </button>
+            </div>
+            <input type="file" id="csvFileInput" accept=".csv">
+            <div class="import-button-container ms-2">
+                <button id="importCsvButton" class="btn btn-primary btn-md text-white">
+                    Import
                 </button>
             </div>
             <div class="ms-2">
