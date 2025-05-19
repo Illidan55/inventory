@@ -1,7 +1,6 @@
 function triggerFileInput() {
     document.getElementById('csvFileInput').click();
 }
-
 async function handleFileSelectAndUpload(event) {
     const fileInput = event.target;
 
@@ -12,27 +11,82 @@ async function handleFileSelectAndUpload(event) {
 
     const file = fileInput.files[0];
     const formData = new FormData();
-    formData.append('csvFile', file);
+    formData.append('file', file);
     console.log(`Preparing to upload: ${file.name}`);
+
     try {
         const response = await fetch('/import', {
             method: 'POST',
             body: formData,
         });
-        const result = await response.json();
-        if (response.ok) {
-            console.log('Upload successful:', result);
-            alert(`Successfully uploaded "${file.name}".`);
-        } else {
-            console.error('Upload failed:', result);
-            alert(`Error uploading "${file.name}": ${result.message || response.statusText || 'Unknown error.'}`);
+
+        if (response.ok && response.redirected) {
+            console.log(`Upload of "${file.name}" led to a redirect to ${response.url}. Page will refresh.`);
+            alert(`"${file.name}" successfully uploaded`);
+            window.location.reload();
+            return;
         }
-    } catch (error) {
-        console.error('Upload error:', error);
-        alert(`An error occurred during upload of "${file.name}". Check the console.`);
+
+        const contentType = response.headers.get("content-type");
+        let resultData = null;
+        let parsingError = false;
+
+        if (contentType && contentType.toLowerCase().includes("application/json")) {
+            try {
+                resultData = await response.json();
+            } catch (e) {
+                console.error("Failed to parse JSON response from server:", e);
+                resultData = { serverMessage: "Error: Received malformed JSON from server." };
+                parsingError = true;
+            }
+        } else {
+            const textResponse = await response.text();
+            resultData = { serverMessage: textResponse };
+            if (contentType) {
+                console.warn(`Received non-JSON response with Content-Type: ${contentType}`);
+            } else {
+                console.warn("Received response with no Content-Type. Treated as text.");
+            }
+            if (typeof textResponse === 'string' && (textResponse.trim().toLowerCase().startsWith("<!doctype html") || textResponse.trim().toLowerCase().startsWith("<html"))) {
+                console.error("Server returned an HTML page, possibly an error page:", textResponse);
+                resultData.serverMessage = "Server returned an HTML page (likely an error). Check console for details.";
+            }
+        }
+
+        if (response.ok && !parsingError) {
+            console.log('Upload successful (direct response):', resultData);
+            alert(`Upload of "${file.name}" successful. Server says: ${resultData.serverMessage || 'Success.'}`);
+            window.location.reload();
+        } else {
+            console.error('Upload failed. HTTP Status:', response.status, 'Response data:', resultData);
+            let alertMessage = `Error uploading "${file.name}": `;
+            if (resultData && resultData.serverMessage) {
+                alertMessage += resultData.serverMessage;
+            } else if (response.statusText) {
+                alertMessage += response.statusText;
+            } else if (parsingError) {
+                alertMessage += "Malformed response from server.";
+            }
+            else {
+                alertMessage += "Unknown error.";
+            }
+            alert(alertMessage);
+        }
+    } catch (networkError) {
+        console.error('Upload network error:', networkError);
+        alert(`A network error occurred while uploading "${file.name}". Please check your connection and try again.`);
     } finally {
         fileInput.value = '';
     }
 }
-window.triggerFileInput = triggerFileInput;
-window.handleFileSelectAndUpload = handleFileSelectAndUpload;
+document.addEventListener('DOMContentLoaded', () => {
+    const csvFileInputElement = document.getElementById('csvFileInput');
+    if (csvFileInputElement) {
+        csvFileInputElement.addEventListener('change', handleFileSelectAndUpload);
+    }
+
+    const importButtonElement = document.getElementById('importCsvButton');
+    if (importButtonElement) {
+        importButtonElement.addEventListener('click', triggerFileInput);
+    }
+});

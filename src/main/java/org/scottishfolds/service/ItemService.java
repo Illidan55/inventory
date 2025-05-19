@@ -8,7 +8,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -102,5 +108,52 @@ public class ItemService {
         Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return itemRepository.findByKeyword(keyword, pageable);
+    }
+    /**
+     * Imports items from a CSV file.
+     * Assumes CSV format: name,type, count, costPerUnit
+     *
+     * @param file The CSV file to import.
+     * @throws IOException If an error occurs during file reading.
+     * @throws IllegalArgumentException If the file data is not as expected.
+     */
+    public void importItemsFromCSV(MultipartFile file) throws IOException {
+        List<Item> itemsToSave = new ArrayList<>();
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("CSV file is empty.");
+        }
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String line;
+            boolean isHeader = true;
+
+            while ((line = br.readLine()) != null) {
+                if (isHeader) {
+                    isHeader = false;
+                    continue;
+                }
+
+                String[] values = line.split(",");
+                if (values.length >= 3) {
+                    Item item = new Item();
+                    item.setName(values[0].trim());
+                    item.setType(values[1].trim());
+                    item.setCount(Integer.parseInt(values[2].trim()));
+                    try {
+                        item.setCostPerUnit(Float.parseFloat(values[3].trim()));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Skipping row due to invalid costPerUnit format: " + line + ". Error: " + e.getMessage());
+                        continue;
+                    }
+                    itemsToSave.add(item);
+                } else {
+                    System.err.println("Skipping malformed CSV row: " + line);
+                }
+            }
+        }
+
+        if (!itemsToSave.isEmpty()) {
+            itemRepository.saveAll(itemsToSave);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.scottishfolds.controller;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.scottishfolds.entity.Item;
 import org.scottishfolds.requestDTO.CreateItem;
 import org.scottishfolds.service.ItemService;
@@ -8,7 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +20,7 @@ import java.util.Optional;
  * Item controller to handle the backend for the raw materials
  */
 @Controller
+@Slf4j
 public class ItemController {
     private final ItemService itemService;
 
@@ -81,6 +86,30 @@ public class ItemController {
     @ResponseBody
     public Optional<Item> findById(@PathVariable(name = "id") String id) {
         return itemService.findById(id);
+    }
+    /**
+     * Controller method to handle CSV file upload for importing items.
+     *
+     * @param file The uploaded CSV file.
+     * @param redirectAttributes Used to add flash attributes for messages on redirect.
+     * @return A redirect string to the home page.
+     */
+    @PostMapping("/import")
+    public String uploadCSVFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+        if (file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Please select a CSV file to upload.");
+            return "redirect:/";
+        }
+        try {
+            itemService.importItemsFromCSV(file);
+            redirectAttributes.addFlashAttribute("successMessage", "Successfully imported items from " + file.getOriginalFilename());
+        } catch (IOException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to import items: " + e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred.");
+        }
+        return "redirect:/";
+
     }
 
     /**

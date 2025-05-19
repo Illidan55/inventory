@@ -20,8 +20,8 @@
     </div>
 </div>
 <div id="sortData"
-     th:data-page-number="${page.number + 1}"
-     th:data-page-size="${page.size}"
+     th:data-page-number="${page?.number != null ? page.number + 1 : '1'}"
+     th:data-page-size="${page?.size != null ? page.size : '10'}"
      th:data-keyword="${keyword}"
      th:data-base-path="@{/page}"
      th:data-sort-field="${sortField}"
@@ -46,9 +46,9 @@
                     Add Item
                 </button>
             </div>
-            <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileSelectAndUpload(event)">
+            <input type="file" id="csvFileInput" accept=".csv">
             <div class="import-button-container ms-2">
-                <button class="btn btn-primary btn-md text-white" onclick="triggerFileInput()">
+                <button id="importCsvButton" class="btn btn-primary btn-md text-white">
                     Import
                 </button>
             </div>
