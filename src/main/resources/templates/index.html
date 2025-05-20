@@ -12,7 +12,7 @@
 <div th:replace="~{fragments/nav :: header}"></div>
 <div class="title-container">
     <div class="title-logo">
-        <img class="logo" th:src="@{/images/logo.png}" alt="logo"/>
+        <img class="logo" th:src="${@environment.getProperty('homepage.logoPath')}" alt="logo"/>
     </div>
     <div class="title-text">
         <h1 th:text="${@environment.getProperty('homepage.title')}"/>
