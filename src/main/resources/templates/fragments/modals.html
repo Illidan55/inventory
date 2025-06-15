@@ -39,6 +39,12 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <input type="hidden" name="pageNumber" value="">
+          <input type="hidden" name="pageSize" value="">
+          <input type="hidden" name="sortField" value="">
+          <input type="hidden" name="sortDirection" value="">
+          <input type="hidden" name="keyword" value="">
+
           <div th:replace="${formBodyFragmentRef}">Fallback Form Body</div>
         </div>
         <div class="modal-footer">

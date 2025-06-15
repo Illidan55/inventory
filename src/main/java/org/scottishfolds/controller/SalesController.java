@@ -15,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Sales controller to handle the backend for sales
@@ -48,9 +50,24 @@ public class SalesController {
     }
 
     @PostMapping("/editSale")
-    public String editSale(EditSale editSale) {
+    public String editSale(EditSale editSale,
+                           @RequestParam("pageNumber") int pageNumber,
+                           @RequestParam("pageSize") int pageSize,
+                           @RequestParam("sortField") String sortField,
+                           @RequestParam("sortDirection") String sortDirection,
+                           @RequestParam(value = "keyword", required = false) String keyword,
+                           RedirectAttributes redirectAttributes) {
         saleService.updateSale(editSale);
-        return "redirect:/sales/";
+
+        redirectAttributes.addAttribute("pageNumber", pageNumber);
+        redirectAttributes.addAttribute("pageSize", pageSize);
+        redirectAttributes.addAttribute("sortField", sortField);
+        redirectAttributes.addAttribute("sortDirection", sortDirection);
+        if (keyword != null && !keyword.isEmpty()) {
+            redirectAttributes.addAttribute("keyword", keyword);
+        }
+
+        return "redirect:/sales/page";
     }
 
     @GetMapping("/getSale/{id}")
@@ -103,6 +120,7 @@ public class SalesController {
         Map<String, Object> chartData = saleService.getSalesDataForLineChart(timeframe);
         return ResponseEntity.ok(chartData);
     }
+
     @GetMapping("/revenueChart")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getRevenueChartData(@RequestParam String timeframe) {
@@ -117,7 +135,7 @@ public class SalesController {
     /**
      * Controller method to handle CSV file upload for importing sales.
      *
-     * @param file The uploaded CSV file.
+     * @param file               The uploaded CSV file.
      * @param redirectAttributes Used to add flash attributes for messages on redirect.
      * @return A redirect string to the home page.
      */

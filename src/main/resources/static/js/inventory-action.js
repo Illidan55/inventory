@@ -6,6 +6,19 @@ $(document).ready(function () {
         const href = $button.attr('href');
 
         if ($button.hasClass('btn-edit')) {
+            const $sortData = $('#sortData');
+            const pageNumber = $sortData.data('page-number');
+            const pageSize = $sortData.data('page-size');
+            const sortField = $sortData.data('sort-field');
+            const sortDirection = $sortData.data('sort-direction');
+            const keyword = $sortData.data('keyword');
+            const $editForm = $('#editItemModal').find('form');
+
+            $editForm.find('input[name="pageNumber"]').val(pageNumber);
+            $editForm.find('input[name="pageSize"]').val(pageSize);
+            $editForm.find('input[name="sortField"]').val(sortField);
+            $editForm.find('input[name="sortDirection"]').val(sortDirection);
+            $editForm.find('input[name="keyword"]').val(keyword);
             $.get(href, function (item) {
                 $('#formIdEditItem').val(item.id);
                 $('#formNameEditItem').val(item.name);

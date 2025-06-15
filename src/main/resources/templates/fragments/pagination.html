@@ -24,30 +24,91 @@
     </div>
     <div th:unless="${page.totalPages > 1}"></div> <div>
     <nav aria-label="Pagination" th:if="${page.totalPages > 1}">
-        <ul class="pagination justify-content-center mb-0"> <li class="page-item" th:classappend="${page.first} ? 'disabled'">
-            <a class="page-link"
-               th:href="@{${basePath}(pageNumber=1, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">First</a>
-        </li>
+        <ul class="pagination justify-content-center mb-0">
 
+            <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${basePath}(pageNumber=1, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">First</a>
+            </li>
             <li class="page-item" th:classappend="${page.first} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{${basePath}(pageNumber=${page.number}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">Previous</a>
             </li>
 
-            <li class="page-item" th:each="i : ${#numbers.sequence(1, page.totalPages)}"
-                th:classappend="${i == page.number + 1} ? 'active'">
-                <a class="page-link" th:if="${i != page.number + 1}"
-                   th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
-                   th:text="${i}"></a>
-                <span class="page-link" th:unless="${i != page.number + 1}" th:text="${i}"></span>
-            </li>
+            <th:block th:with="currentPage=${page.number + 1}, totalPages=${page.totalPages}">
+                <th:block th:if="${totalPages <= 12}">
+                    <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:if="${i != currentPage}"
+                           th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                           th:text="${i}"></a>
+                        <span class="page-link" th:unless="${i != currentPage}" th:text="${i}"></span>
+                    </li>
+                </th:block>
 
+                <th:block th:unless="${totalPages <= 12}">
+                    <th:block th:if="${currentPage < 8}">
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, 9)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:if="${i != currentPage}"
+                               th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                               th:text="${i}"></a>
+                            <span class="page-link" th:unless="${i != currentPage}" th:text="${i}"></span>
+                        </li>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(totalPages - 1, totalPages)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:if="${i != currentPage}"
+                               th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                               th:text="${i}"></a>
+                            <span class="page-link" th:unless="${i != currentPage}" th:text="${i}"></span>
+                        </li>
+                    </th:block>
+
+                    <th:block th:if="${currentPage > totalPages - 7}">
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, 2)}">
+                            <a class="page-link"
+                               th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                               th:text="${i}"></a>
+                        </li>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(totalPages - 8, totalPages)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:if="${i != currentPage}"
+                               th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                               th:text="${i}"></a>
+                            <span class="page-link" th:unless="${i != currentPage}" th:text="${i}"></span>
+                        </li>
+                    </th:block>
+
+                    <th:block th:if="${currentPage >= 8 && currentPage <= totalPages - 7}">
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, 2)}">
+                            <a class="page-link"
+                               th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                               th:text="${i}"></a>
+                        </li>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link" th:if="${i != currentPage}"
+                               th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                               th:text="${i}"></a>
+                            <span class="page-link" th:unless="${i != currentPage}" th:text="${i}"></span>
+                        </li>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(totalPages - 1, totalPages)}">
+                            <a class="page-link"
+                               th:href="@{${basePath}(pageNumber=${i}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}"
+                               th:text="${i}"></a>
+                        </li>
+                    </th:block>
+                </th:block>
+            </th:block>
 
             <li class="page-item" th:classappend="${page.last} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{${basePath}(pageNumber=${page.number + 2}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">Next</a>
             </li>
-
             <li class="page-item" th:classappend="${page.last} ? 'disabled'">
                 <a class="page-link"
                    th:href="@{${basePath}(pageNumber=${page.totalPages}, pageSize=${page.size}, sortField=${sortField}, sortDirection=${sortDirection}, keyword=${keyword})}">Last</a>

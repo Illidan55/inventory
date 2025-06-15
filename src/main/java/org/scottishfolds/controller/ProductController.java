@@ -69,9 +69,24 @@ public class ProductController {
      * @return
      */
     @PostMapping(value = "/editProduct")
-    public String editProduct(Product product) {
+    public String editProduct(Product product,
+                           @RequestParam("pageNumber") int pageNumber,
+                           @RequestParam("pageSize") int pageSize,
+                           @RequestParam("sortField") String sortField,
+                           @RequestParam("sortDirection") String sortDirection,
+                           @RequestParam(value = "keyword", required = false) String keyword,
+                           RedirectAttributes redirectAttributes) {
         productService.save(product);
-        return "redirect:/product/";
+
+        redirectAttributes.addAttribute("pageNumber", pageNumber);
+        redirectAttributes.addAttribute("pageSize", pageSize);
+        redirectAttributes.addAttribute("sortField", sortField);
+        redirectAttributes.addAttribute("sortDirection", sortDirection);
+        if (keyword != null && !keyword.isEmpty()) {
+            redirectAttributes.addAttribute("keyword", keyword);
+        }
+
+        return "redirect:/product/page";
     }
 
     /**

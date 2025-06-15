@@ -71,9 +71,24 @@ public class ItemController {
      * @return
      */
     @PostMapping(value = "/editItem")
-    public String editItem(Item item) {
+    public String editItem(Item item,
+                           @RequestParam("pageNumber") int pageNumber,
+                           @RequestParam("pageSize") int pageSize,
+                           @RequestParam("sortField") String sortField,
+                           @RequestParam("sortDirection") String sortDirection,
+                           @RequestParam(value = "keyword", required = false) String keyword,
+                           RedirectAttributes redirectAttributes) {
         itemService.save(item);
-        return "redirect:/";
+
+        redirectAttributes.addAttribute("pageNumber", pageNumber);
+        redirectAttributes.addAttribute("pageSize", pageSize);
+        redirectAttributes.addAttribute("sortField", sortField);
+        redirectAttributes.addAttribute("sortDirection", sortDirection);
+        if (keyword != null && !keyword.isEmpty()) {
+            redirectAttributes.addAttribute("keyword", keyword);
+        }
+
+        return "redirect:/page";
     }
 
     /**
