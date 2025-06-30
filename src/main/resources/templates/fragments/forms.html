@@ -18,9 +18,9 @@
     <input required type="text" th:id="${editMode ? 'formTypeEditItem' : 'formTypeAddItem'}" name="type" placeholder="Type"
            class="form-control mb-4 col-4"/>
   </div>
-  <div class="form-group" th:if="${editMode}">
-    <label for="formCountEditItem" class="form-label">Count</label>
-    <input required type="number" id="formCountEditItem" name="count" placeholder="0"
+  <div class="form-group">
+    <label th:for="${editMode ? 'formCountEditItem' : 'formCountAddItem'}" class="form-label">Count</label>
+    <input required type="number" th:id="${editMode ? 'formCountEditItem' : 'formCountAddItem'}" name="count" placeholder="0"
            class="form-control mb-4 col-4"/>
   </div>
   <div class="form-group">

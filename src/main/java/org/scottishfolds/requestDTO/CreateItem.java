@@ -10,4 +10,5 @@ public class CreateItem {
     private String name;
     private float costPerUnit;
     private String type;
+    private int count;
 }

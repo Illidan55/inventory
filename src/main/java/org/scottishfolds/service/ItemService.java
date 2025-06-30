@@ -52,13 +52,12 @@ public class ItemService {
      */
     public void createItem(CreateItem createItem) {
         Item item = new Item();
+        item.setCount(createItem.getCount());
         item.setName(createItem.getName());
         item.setType(createItem.getType());
-        item.setCount(0);
         item.setCostPerUnit(createItem.getCostPerUnit());
 
         itemRepository.save(item);
-
     }
 
     /**
