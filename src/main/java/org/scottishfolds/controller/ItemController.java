@@ -59,9 +59,23 @@ public class ItemController {
      * @return
      */
     @PostMapping("/addItem")
-    public String createItem(@ModelAttribute("createItem") CreateItem createItem) {
+    public String createItem(@ModelAttribute("createItem") CreateItem createItem,
+                             @RequestParam("pageNumber") int pageNumber,
+                             @RequestParam("pageSize") int pageSize,
+                             @RequestParam("sortField") String sortField,
+                             @RequestParam("sortDirection") String sortDirection,
+                             @RequestParam(value = "keyword", required = false) String keyword,
+                             RedirectAttributes redirectAttributes) {
         itemService.createItem(createItem);
-        return "redirect:/";
+        redirectAttributes.addAttribute("pageNumber", pageNumber);
+        redirectAttributes.addAttribute("pageSize", pageSize);
+        redirectAttributes.addAttribute("sortField", sortField);
+        redirectAttributes.addAttribute("sortDirection", sortDirection);
+        if (keyword != null && !keyword.isEmpty()) {
+            redirectAttributes.addAttribute("keyword", keyword);
+        }
+
+        return "redirect:/page";
     }
 
     /**
@@ -134,9 +148,23 @@ public class ItemController {
      * @return
      */
     @PostMapping(value = "/deleteItem")
-    public String deleteItem(String id) {
+    public String deleteItem(String id,
+                             @RequestParam(name = "pageNumber", defaultValue = "1") int pageNumber,
+                             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+                             @RequestParam("sortField") String sortField,
+                             @RequestParam("sortDirection") String sortDirection,
+                             @RequestParam(value = "keyword", required = false) String keyword,
+                             RedirectAttributes redirectAttributes) {
         itemService.deleteById(id);
-        return "redirect:/";
+        redirectAttributes.addAttribute("pageNumber", pageNumber);
+        redirectAttributes.addAttribute("pageSize", pageSize);
+        redirectAttributes.addAttribute("sortField", sortField);
+        redirectAttributes.addAttribute("sortDirection", sortDirection);
+        if (keyword != null && !keyword.isEmpty()) {
+            redirectAttributes.addAttribute("keyword", keyword);
+        }
+
+        return "redirect:/page";
     }
 
     /**

@@ -57,9 +57,23 @@ public class ProductController {
      * @return
      */
     @PostMapping("/addProduct")
-    public String createProduct(@ModelAttribute("createItem") CreateProduct createProduct) {
+    public String createProduct(@ModelAttribute("createItem") CreateProduct createProduct,
+                                @RequestParam("pageNumber") int pageNumber,
+                                @RequestParam("pageSize") int pageSize,
+                                @RequestParam("sortField") String sortField,
+                                @RequestParam("sortDirection") String sortDirection,
+                                @RequestParam(value = "keyword", required = false) String keyword,
+                                RedirectAttributes redirectAttributes) {
         productService.createProduct(createProduct);
-        return "redirect:/product/";
+        redirectAttributes.addAttribute("pageNumber", pageNumber);
+        redirectAttributes.addAttribute("pageSize", pageSize);
+        redirectAttributes.addAttribute("sortField", sortField);
+        redirectAttributes.addAttribute("sortDirection", sortDirection);
+        if (keyword != null && !keyword.isEmpty()) {
+            redirectAttributes.addAttribute("keyword", keyword);
+        }
+
+        return "redirect:/product/page";
     }
 
     /**
@@ -108,9 +122,23 @@ public class ProductController {
      * @return
      */
     @PostMapping("/deleteProduct")
-    public String deleteProduct(@RequestParam String id) {
+    public String deleteProduct(@RequestParam String id,
+                                @RequestParam(name = "pageNumber", defaultValue = "1") int pageNumber,
+                                @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+                                @RequestParam("sortField") String sortField,
+                                @RequestParam("sortDirection") String sortDirection,
+                                @RequestParam(value = "keyword", required = false) String keyword,
+                                RedirectAttributes redirectAttributes) {
         productService.deleteById(id);
-        return "redirect:/product/";
+        redirectAttributes.addAttribute("pageNumber", pageNumber);
+        redirectAttributes.addAttribute("pageSize", pageSize);
+        redirectAttributes.addAttribute("sortField", sortField);
+        redirectAttributes.addAttribute("sortDirection", sortDirection);
+        if (keyword != null && !keyword.isEmpty()) {
+            redirectAttributes.addAttribute("keyword", keyword);
+        }
+
+        return "redirect:/product/page";
     }
 
     /**

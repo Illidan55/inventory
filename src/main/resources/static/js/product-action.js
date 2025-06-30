@@ -1,5 +1,20 @@
 //jquery
 $(document).ready(function () {
+    $('button[data-bs-target="#addProductModal"]').on('click', function() {
+        const $sortData = $('#sortData');
+        const pageNumber = $sortData.data('page-number');
+        const pageSize = $sortData.data('page-size');
+        const sortField = $sortData.data('sort-field');
+        const sortDirection = $sortData.data('sort-direction');
+        const keyword = $sortData.data('keyword');
+        const $addForm = $('#addProductModal').find('form');
+
+        $addForm.find('input[name="pageNumber"]').val(pageNumber);
+        $addForm.find('input[name="pageSize"]').val(pageSize);
+        $addForm.find('input[name="sortField"]').val(sortField);
+        $addForm.find('input[name="sortDirection"]').val(sortDirection);
+        $addForm.find('input[name="keyword"]').val(keyword);
+    });
     $('.table tbody').on('click', '.btn', function (event) {
         event.preventDefault();
         const $button = $(this);
@@ -49,6 +64,19 @@ $(document).ready(function () {
             if (productId !== undefined && productName !== undefined && modalTargetSelector) {
                 const modalElement = document.querySelector(modalTargetSelector);
                 if (modalElement) {
+                    const $sortData = $('#sortData');
+                    const pageNumber = $sortData.data('page-number');
+                    const pageSize = $sortData.data('page-size');
+                    const sortField = $sortData.data('sort-field');
+                    const sortDirection = $sortData.data('sort-direction');
+                    const keyword = $sortData.data('keyword');
+                    const $deleteForm = $(modalElement).find('form'); // Use jQuery to find the form
+
+                    $deleteForm.find('input[name="pageNumber"]').val(pageNumber);
+                    $deleteForm.find('input[name="pageSize"]').val(pageSize);
+                    $deleteForm.find('input[name="sortField"]').val(sortField);
+                    $deleteForm.find('input[name="sortDirection"]').val(sortDirection);
+                    $deleteForm.find('input[name="keyword"]').val(keyword);
                     const inputIdElement = modalElement.querySelector('#formIdDeleteProduct');
                     const messageElement = modalElement.querySelector('#messageDeleteProduct');
                     if (inputIdElement) {
